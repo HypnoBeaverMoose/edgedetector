@@ -25,7 +25,7 @@ Image<T> Image<T>::CombineImages(const Image<T> &left, const Image<T> &right, st
 }
 
 template <typename T>
-T Image<T>::GetPixel(int x, int y, OverflowStrategy overflow, int def) const
+T Image<T>::GetPixel(int x, int y, OverflowStrategy overflow, T def) const
 {
     switch (overflow)
     {
@@ -83,7 +83,7 @@ int Image<T>::GetHeight() const
 }
 
 template <typename T>
-Image<T> Image<T>::GetConvolved(int size, T *kernel) const // TODO const int* ?
+Image<T> Image<T>::GetConvolved(int size, int *kernel) const // TODO const int* ?
 {
     Image result(_width, _height, std::vector<T>(_data.size()));
 
@@ -92,7 +92,7 @@ Image<T> Image<T>::GetConvolved(int size, T *kernel) const // TODO const int* ?
     {
         for (size_t x = 0; x < _width; x++)
         {
-            int sum = 0;
+            T sum = 0;
             for (size_t kernelY = 0; kernelY < size; kernelY++)
             {
                 for (size_t kernelX = 0; kernelX < size; kernelX++)
@@ -124,8 +124,8 @@ void Image<T>::ApplyThreshold(T normalizer, T threshold)
     T max = *std::max_element(_data.begin(), _data.end());
     for (size_t i = 0; i < _data.size(); i++)
     {
-        T normalized = (_data[i] / (float)max) * normalizer; // NormalizeElement(, max) * normalizer;
-        _data[i] = normalized > threshold ? normalized : 0;
+        T normalized = NormalizeElement(_data[i], max) * normalizer;
+        _data[i] = normalized > threshold ? normalizer : 0;
     }
 }
 

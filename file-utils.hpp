@@ -3,7 +3,7 @@
 
 namespace FileUtils
 {
-    Image<int> LoadImage(std::string filename);
+    Image<float> LoadImage(std::string filename);
 
-    void SaveImage(Image<int> image, std::string filename);
+    void SaveImage(Image<float> image, std::string filename);
 }

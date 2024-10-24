@@ -75,14 +75,14 @@ private:
 };
 
 
-class TgaImageFactory : ImageFactory<int>
+class TgaImageFactory : ImageFactory<float>
 {
 public:
     TgaImageFactory(const std::string &filename) : _filename(filename)
     {
     }
 
-    virtual Image<int> GetImage()
+    virtual Image<float> GetImage()
     {
         return FileUtils::LoadImage(_filename);
     }

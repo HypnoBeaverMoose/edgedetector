@@ -8,15 +8,16 @@
 
 int main(int argc, char **argv)
 {
-    Image<int> im = TgaImageFactory("input.tga").GetImage();
+    Image<float> im = TgaImageFactory("input.tga").GetImage();
 
-    Image<int> resultX = im.GetConvolved(3, sobelX);
-    Image<int> resultY = im.GetConvolved(3, sobelY);
-    Image<int> gradient = Image<int>::CombineImages(resultX, resultY, CombineGradients<int>);
-    Image<int> direction = Image<int>::CombineImages(resultX, resultY, GradientDirection<int>);
-    Image<int> result = FindLocalMaxima(gradient, direction);
-    result.ApplyThreshold(255, 30);
+    Image<float> resultX = im.GetConvolved(3, sobelX);
+    Image<float> resultY = im.GetConvolved(3, sobelY);
+    Image<float> gradient = Image<float>::CombineImages(resultX, resultY, CombineGradients<float>);
+    Image<float> direction = Image<float>::CombineImages(resultX, resultY, GradientDirection<float>);
+    Image<float> result = FindLocalMaxima(gradient, direction);
+    result.ApplyThreshold(1, 0.12f);
 
+    //gradient.Normalize(1.0f);
     FileUtils::SaveImage(result, "output.tga");
     // std::vector<Coord> nonZero = FindNonZeroPixels(result);
     // for (size_t i = 0; i < nonZero.size(); i++)

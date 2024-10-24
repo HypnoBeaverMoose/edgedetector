@@ -21,7 +21,7 @@ struct Header
 };
 #pragma pack(pop)
 
-Image<int> FileUtils::LoadImage(std::string filename)
+Image<float> FileUtils::LoadImage(std::string filename)
 {
     std::ifstream file(filename, std::ios::binary);
     if (!file)
@@ -47,29 +47,29 @@ Image<int> FileUtils::LoadImage(std::string filename)
         exit(1);
     }
 
-    std::vector<int> result;
+    std::vector<float> result;
     int pixelCount = data.size() / 3;
     for (size_t i = 0; i < pixelCount; i++)
     {
         int channel = i * 3;
-        float intensity = ((int)data[channel] +
-                           (int)data[channel + 1] + (int)data[channel + 2]) /
+        float intensity = ((float)data[channel] +
+                           (float)data[channel + 1] + (float)data[channel + 2]) /
                           (3.0f * 255);
 
-        result.push_back(std::round(intensity * 255));
+        result.push_back(intensity);
     }
 
-    return Image<int>(header.width, header.height, result);
+    return Image<float>(header.width, header.height, result);
 }
 
-void FileUtils::SaveImage(Image<int> image, std::string filename)
+void FileUtils::SaveImage(Image<float> image, std::string filename)
 {
     std::vector<unsigned char> data;
     for (size_t y = 0; y < image.GetHeight(); y++)
     {
         for (size_t x = 0; x < image.GetWidth(); x++)
         {
-            unsigned char pixel = (unsigned char)image.GetPixel(x, y);
+            unsigned char pixel = (unsigned char)(image.GetPixel(x, y) * 255);
             data.push_back(pixel);
             data.push_back(pixel);
             data.push_back(pixel);

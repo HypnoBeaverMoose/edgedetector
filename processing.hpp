@@ -16,8 +16,7 @@ int offsets[4][2] = {{0, 1}, {1, 1}, {1, 0}, {1, -1}};
 template <typename T>
 T GradientDirection(T left, T right)
 {
-    // return std::round((std::atan2((float)left, (float)right) * 57.2958f));
-    float deg = (std::atan2((float)left, (float)right) * 57.2958f);
+    float deg = (std::atan2((float)left, (float)right) * 57.2958);
     deg = deg / 45.0f;
     int index = std::round(deg);
     if (index < 0)
@@ -34,7 +33,7 @@ T GradientDirection(T left, T right)
 template <typename T>
 T CombineGradients(T left, T right)
 {
-    return std::round(std::sqrt(left * left + right * right));
+    return std::sqrt(left * left + right * right);
 }
 
 template <typename T>
@@ -72,16 +71,16 @@ Image<T> FindLocalMaxima(const Image<T> &gradient, const Image<T> &direction)
     {
         for (size_t x = 0; x < width; x++)
         {
-            int directionIndex = direction.GetPixel(x, y);
+            int directionIndex = (int)direction.GetPixel(x, y);
             int positiveX = x + offsets[directionIndex][0];
             int positiveY = y + offsets[directionIndex][1];
 
             int negativeX = x - offsets[directionIndex][0];
             int negativeY = y - offsets[directionIndex][1];
 
-            int before = gradient.GetPixel(positiveX, positiveY);
-            int after = gradient.GetPixel(negativeX, negativeY);
-            int current = gradient.GetPixel(x, y);
+            T before = gradient.GetPixel(positiveX, positiveY);
+            T after = gradient.GetPixel(negativeX, negativeY);
+            T current = gradient.GetPixel(x, y);
 
             if (current >= before && current > after)
             {
