@@ -7,10 +7,31 @@ Image::Image(int width, int height, const std::vector<int> &input) : _width(widt
 {
 }
 
+Image Image::CombineImages(const Image &left, const Image &right, std::function<int(int, int)> func)
+{
+    if (left._width != right._width || left._height != right._height)
+    {
+        std::cout << "Images of different sizes";
+        return Image(0, 0, std::vector<int>());
+    }
+
+    int height = left._height, width = left._width;
+
+    Image result(width, height, std::vector<int>(left._data.size()));
+
+    for (size_t i = 0; i < left._data.size(); i++)
+    {
+        result._data[i] = func(left._data[i], right._data[i]);
+    }
+
+    return result;
+}
+
 int Image::GetPixel(int x, int y) const
 {
-    x = std::max(0, std::min(x, _width -1));
-    y = std::max(0, std::min(y, _height -1));
+    // TODO:: which is better?
+    x = std::max(0, std::min(x, _width - 1));
+    y = std::max(0, std::min(y, _height - 1));
 
     // if (x < 0)
     // {

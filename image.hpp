@@ -17,6 +17,8 @@ public:
 
     Image Convolve(int size, int* kernel);
 
+    static Image CombineImages(const Image& left, const Image& right, std::function<int(int, int)> func);
+
 private:
     std::vector<int> _data;
     int _width;
