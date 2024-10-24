@@ -1,0 +1,4 @@
+*.dSYM
+*.out
+bin/
+.DS_Store
