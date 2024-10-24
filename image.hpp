@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 
+template <typename T>
 class Image
 {
 public:
@@ -16,24 +17,40 @@ public:
 
     Image(int width, int height) : _width(width), _height(height), _data(width * height) {};
 
-    Image::Image(int width, int height, const std::vector<int> &input) : _width(width), _height(height), _data(input) {}
+    Image(int width, int height, const std::vector<T> &input) : _width(width), _height(height), _data(input) {}
 
-    int GetPixel(int x, int y, OverflowStrategy overflow = DEFAULT, int def = 0) const;
+    T GetPixel(int x, int y, OverflowStrategy overflow = DEFAULT, int def = 0) const;
 
-    void SetPixel(int x, int y, int value);
+    void SetPixel(int x, int y, T value);
 
     int GetWidth() const;
 
     int GetHeight() const;
 
-    Image Convolve(int size, int *kernel);
+    Image<T> Convolve(int size, T *kernel) const;
 
-    static Image CombineImages(const Image &left, const Image &right, std::function<int(int, int)> func);
+    static Image<T> CombineImages(const Image &left, const Image &right, std::function<T(T, T)> func);
 
 private:
-    std::vector<int> _data;
+    std::vector<T> _data;
     int _width;
     int _height;
 };
 
-std::ostream &operator<<(std::ostream &strm, const Image &a);
+template <typename T>
+std::ostream &operator<<(std::ostream &strm, const Image<T> &a)
+{
+    int height = a.GetHeight();
+    int width = a.GetWidth();
+
+    for (size_t y = 0; y < height; y++)
+    {
+        for (size_t x = 0; x < width; x++)
+        {
+            strm << a.GetPixel(x, y) << " ";
+        }
+        strm << "\n";
+    }
+
+    return strm;
+}

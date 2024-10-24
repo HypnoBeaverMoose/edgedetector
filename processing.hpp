@@ -5,7 +5,8 @@
 
 int offsets[4][2] = {{0, 1}, {1, 1}, {1, 0}, {1, -1}};
 
-int GradientDirection(int left, int right)
+template <typename T> 
+T GradientDirection(T left, T right)
 {
     // return std::round((std::atan2((float)left, (float)right) * 57.2958f));
     float deg = (std::atan2((float)left, (float)right) * 57.2958f);
@@ -22,12 +23,13 @@ int GradientDirection(int left, int right)
     return index;
 }
 
-int CombineGradients(int left, int right)
+template <typename T> T CombineGradients(T left, T right)
 {
     return std::round(std::sqrt(left * left + right * right));
 }
 
-Image FindLocalMaxima(const Image &gradient, const Image &direction)
+template <typename T> 
+Image<T> FindLocalMaxima(const Image<T> &gradient, const Image<T> &direction)
 {
     if (gradient.GetHeight() != direction.GetHeight() || gradient.GetWidth() != direction.GetWidth())
     {
@@ -38,7 +40,7 @@ Image FindLocalMaxima(const Image &gradient, const Image &direction)
     int width = gradient.GetWidth();
     int height = gradient.GetHeight();
 
-    Image result(width, height);
+    Image<T> result(width, height);
 
     for (size_t y = 0; y < height; y++)
     {

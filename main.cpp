@@ -8,13 +8,13 @@
 
 int main(int argc, char **argv)
 {
-    Image im = PredefinedImageFactory().GetImage();
+    Image<int> im = PredefinedImageFactory().GetImage();
 
-    Image resultX = im.Convolve(3, sobelX);
-    Image resultY = im.Convolve(3, sobelY);
-    Image gradient = Image::CombineImages(resultX, resultY, CombineGradients);
-    Image direction = Image::CombineImages(resultX, resultY, GradientDirection);
-    Image result = FindLocalMaxima(gradient, direction);
+    Image<int> resultX = im.Convolve(3, sobelX);
+    Image<int> resultY = im.Convolve(3, sobelY);
+    Image<int> gradient = Image<int>::CombineImages(resultX, resultY, CombineGradients<int>);
+    Image<int> direction = Image<int>::CombineImages(resultX, resultY, GradientDirection<int>);
+    Image<int> result = FindLocalMaxima(gradient, direction);
 
     std::cout << gradient;
     std::cout << "-------" << std::endl;

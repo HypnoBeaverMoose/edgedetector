@@ -3,7 +3,8 @@
 #include "image.hpp"
 #include <algorithm>
 
-Image Image::CombineImages(const Image &left, const Image &right, std::function<int(int, int)> func)
+template <typename T>
+Image<T> Image<T>::CombineImages(const Image<T> &left, const Image<T> &right, std::function<T(T, T)> func)
 {
     if (left._width != right._width || left._height != right._height)
     {
@@ -23,7 +24,8 @@ Image Image::CombineImages(const Image &left, const Image &right, std::function<
     return result;
 }
 
-int Image::GetPixel(int x, int y, OverflowStrategy overflow, int def) const
+template <typename T>
+T Image<T>::GetPixel(int x, int y, OverflowStrategy overflow, int def) const
 {
     switch (overflow)
     {
@@ -62,16 +64,26 @@ int Image::GetPixel(int x, int y, OverflowStrategy overflow, int def) const
     return _data.at(y * _width + x);
 }
 
-void Image::SetPixel(int x, int y, int value)
+template <typename T>
+void Image<T>::SetPixel(int x, int y, T value)
 {
     _data.at(y * _width + x) = value;
 }
 
-int Image::GetWidth() const { return _width; }
+template <typename T>
+int Image<T>::GetWidth() const
+{
+    return _width;
+}
 
-int Image::GetHeight() const { return _height; }
+template <typename T>
+int Image<T>::GetHeight() const
+{
+    return _height;
+}
 
-Image Image::Convolve(int size, int *kernel) // TODO const int* ?
+template <typename T>
+Image<T> Image<T>::Convolve(int size, T *kernel) const // TODO const int* ?
 {
     Image result(_width, _height, std::vector<int>(_data.size()));
 
@@ -97,19 +109,4 @@ Image Image::Convolve(int size, int *kernel) // TODO const int* ?
     return result;
 }
 
-std::ostream &operator<<(std::ostream &strm, const Image &a)
-{
-    int height = a.GetHeight();
-    int width = a.GetWidth();
-
-    for (size_t y = 0; y < height; y++)
-    {
-        for (size_t x = 0; x < width; x++)
-        {
-            strm << a.GetPixel(x, y) << " ";
-        }
-        strm << "\n";
-    }
-
-    return strm;
-}
+template class Image<int>;

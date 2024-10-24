@@ -4,16 +4,18 @@
 #include <vector>
 #include "image.hpp"
 
+template <typename T>
 class ImageFactory
 {
 public:
-    virtual Image GetImage() = 0;
+    virtual Image<T> GetImage() = 0;
 };
 
-class PredefinedImageFactory : ImageFactory
+
+class PredefinedImageFactory : ImageFactory<int>
 {
 public:
-    virtual Image GetImage()
+    virtual Image<int> GetImage()
     {
         std::vector<int> v = {  1, 1, 1, 1, 1, 1,
                                 1, 5, 5, 5, 5, 1,
@@ -21,7 +23,7 @@ public:
                                 1, 5, 5, 5, 5, 1,
                                 1, 1, 1, 1, 1, 1,
                              };
-        return Image(6, 5, v);
+        return Image<int>(6, 5, v);
 
         // std::vector<int> v = {  5, 1, 1, 1, 1,
         //                         10, 5, 1, 1,1,
@@ -41,14 +43,14 @@ public:
     }
 };
 
-class TextFileImageFactory : ImageFactory
+class TextFileImageFactory : ImageFactory<int>
 {
 public:
     TextFileImageFactory(const std::string &filename) : _filename(filename)
     {
     }
 
-    virtual Image GetImage()
+    virtual Image<int> GetImage()
     {
         int width, height;
         std::vector<int> data(width * height);
@@ -63,7 +65,7 @@ public:
             data.push_back(n);
         }
 
-        return Image(width, height, data);
+        return Image<int>(width, height, data);
     }
 
 private:
