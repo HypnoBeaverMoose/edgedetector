@@ -15,7 +15,7 @@ public:
 
     int GetHeight() const;
 
-    void Convolve(int size, int* kernel);
+    Image Convolve(int size, int* kernel);
 
 private:
     std::vector<int> _data;

@@ -7,6 +7,6 @@
 int main(int argc, char **argv)
 {
     Image im = PredefinedImageFactory().GetImage();
-    im.Convolve(3, identity);
-    std::cout<<im;
+    Image result = im.Convolve(3, laplace);
+    std::cout<<result;
 }
