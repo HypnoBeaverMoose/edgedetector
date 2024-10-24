@@ -3,6 +3,7 @@
 #include <fstream>
 #include <vector>
 #include "image.hpp"
+#include "file-utils.hpp"
 
 template <typename T>
 class ImageFactory
@@ -17,11 +18,12 @@ class PredefinedImageFactory : ImageFactory<int>
 public:
     virtual Image<int> GetImage()
     {
-        std::vector<int> v = {  1, 1, 1, 1, 1, 1,
-                                1, 5, 5, 5, 5, 1,
-                                1, 5, 5, 5, 5, 1,
-                                1, 5, 5, 5, 5, 1,
-                                1, 1, 1, 1, 1, 1,
+        std::vector<int> v = {  
+                1, 1, 1, 1, 1, 1,
+                1, 5, 5, 5, 5, 1,
+                1, 5, 5, 5, 5, 1,
+                1, 5, 5, 5, 5, 1,
+                1, 1, 1, 1, 1, 1,
                              };
         return Image<int>(6, 5, v);
 
@@ -66,6 +68,23 @@ public:
         }
 
         return Image<int>(width, height, data);
+    }
+
+private:
+    std::string _filename;
+};
+
+
+class TgaImageFactory : ImageFactory<int>
+{
+public:
+    TgaImageFactory(const std::string &filename) : _filename(filename)
+    {
+    }
+
+    virtual Image<int> GetImage()
+    {
+        return FileUtils::LoadImage(_filename);
     }
 
 private:

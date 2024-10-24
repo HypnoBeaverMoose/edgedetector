@@ -14,7 +14,7 @@ Image<T> Image<T>::CombineImages(const Image<T> &left, const Image<T> &right, st
 
     int height = left._height, width = left._width;
 
-    Image result(width, height, std::vector<int>(left._data.size()));
+    Image result(width, height, std::vector<T>(left._data.size()));
 
     for (size_t i = 0; i < left._data.size(); i++)
     {
@@ -85,7 +85,7 @@ int Image<T>::GetHeight() const
 template <typename T>
 Image<T> Image<T>::GetConvolved(int size, T *kernel) const // TODO const int* ?
 {
-    Image result(_width, _height, std::vector<int>(_data.size()));
+    Image result(_width, _height, std::vector<T>(_data.size()));
 
     int halfSize = size / 2;
     for (size_t y = 0; y < _height; y++)
@@ -124,7 +124,7 @@ void Image<T>::ApplyThreshold(T normalizer, T threshold)
     T max = *std::max_element(_data.begin(), _data.end());
     for (size_t i = 0; i < _data.size(); i++)
     {
-        T normalized = NormalizeElement(_data[i], max) * normalizer;
+        T normalized = (_data[i] / (float)max) * normalizer; // NormalizeElement(, max) * normalizer;
         _data[i] = normalized > threshold ? normalized : 0;
     }
 }
@@ -142,3 +142,4 @@ int Image<int>::NormalizeElement(int element, int normalizer)
 }
 
 template class Image<int>;
+template class Image<float>;
