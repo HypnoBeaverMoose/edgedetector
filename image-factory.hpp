@@ -15,8 +15,13 @@ class PredefinedImageFactory : ImageFactory
 public:
     virtual Image GetImage()
     {
-        std::vector<int> v = {10, 20, 30, 40};
-        return Image(2, 2, v);
+        std::vector<int> v = {  
+                                1, 1, 3, 5, 7, 9, 9, 9, 9, 9,
+                                1, 1, 1, 3, 5, 7, 9, 9, 9, 9,
+                                1, 1, 1, 1, 3, 5, 7, 9, 9, 9,
+                                1, 1, 1, 1, 1, 3, 5, 7, 9, 9
+                             };
+        return Image(10, 4, v);
     }
 };
 
