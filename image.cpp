@@ -27,29 +27,41 @@ Image Image::CombineImages(const Image &left, const Image &right, std::function<
     return result;
 }
 
-int Image::GetPixel(int x, int y) const
+int Image::GetPixel(int x, int y, OverflowStrategy overflow, int def) const
 {
-    // TODO:: which is better?
-    x = std::max(0, std::min(x, _width - 1));
-    y = std::max(0, std::min(y, _height - 1));
-
-    // if (x < 0)
-    // {
-    //     x *= -1;
-    // }
-    // else if (x > _width - 1)
-    // {
-    //     x = _width - 1 - (x - (_width - 1));
-    // }
-
-    // if (y < 0)
-    // {
-    //     y *= -1;
-    // }
-    // else if (y > _height - 1)
-    // {
-    //     y = _height - 1 - (y - (_height - 1)); // TODO: Expand
-    // }
+    switch (overflow)
+    {
+    case DEFAULT:
+        if (x < 0 || x >= _width || y < 0 || y >= _height)
+        {
+            return def;
+        }
+        break;
+    case CLAMP:
+        x = std::max(0, std::min(x, _width - 1));
+        y = std::max(0, std::min(y, _height - 1));
+        break;
+    case MIRROR:
+        if (x < 0)
+        {
+            x *= -1;
+        }
+        else if (x > _width - 1)
+        {
+            x = _width - 1 - (x - (_width - 1));
+        }
+        if (y < 0)
+        {
+            y *= -1;
+        }
+        else if (y > _height - 1)
+        {
+            y = _height - 1 - (y - (_height - 1)); // TODO: Expand
+        }
+        break;
+    default:
+        break;
+    }
 
     return _data.at(y * _width + x); // _data[y * _width + x];
 }
@@ -79,7 +91,7 @@ Image Image::Convolve(int size, int *kernel) // TODO const int* ?
                 {
                     int offsetX = x + kernelX - halfSize;
                     int offsetY = y + kernelY - halfSize;
-                    sum += kernel[kernelY * size + kernelX] * GetPixel(offsetX, offsetY);
+                    sum += kernel[kernelY * size + kernelX] * GetPixel(offsetX, offsetY, CLAMP);
                 }
             }
             result.SetPixel(x, y, sum);
