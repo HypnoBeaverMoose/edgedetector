@@ -83,7 +83,7 @@ int Image<T>::GetHeight() const
 }
 
 template <typename T>
-Image<T> Image<T>::Convolve(int size, T *kernel) const // TODO const int* ?
+Image<T> Image<T>::GetConvolved(int size, T *kernel) const // TODO const int* ?
 {
     Image result(_width, _height, std::vector<int>(_data.size()));
 
@@ -107,6 +107,38 @@ Image<T> Image<T>::Convolve(int size, T *kernel) const // TODO const int* ?
     }
 
     return result;
+}
+template <typename T>
+void Image<T>::Normalize(T normalizer)
+{
+    T max = *std::max_element(_data.begin(), _data.end());
+    for (size_t i = 0; i < _data.size(); i++)
+    {
+        _data[i] = NormalizeElement(_data[i], max) * normalizer;
+    }
+}
+
+template <typename T>
+void Image<T>::ApplyThreshold(T normalizer, T threshold)
+{
+    T max = *std::max_element(_data.begin(), _data.end());
+    for (size_t i = 0; i < _data.size(); i++)
+    {
+        T normalized = NormalizeElement(_data[i], max) * normalizer;
+        _data[i] = normalized > threshold ? normalized : 0;
+    }
+}
+
+template <typename T>
+T Image<T>::NormalizeElement(T element, T normalizer)
+{
+    return element / normalizer;
+}
+
+template <>
+int Image<int>::NormalizeElement(int element, int normalizer)
+{
+    return std::round(element / (float)normalizer);
 }
 
 template class Image<int>;

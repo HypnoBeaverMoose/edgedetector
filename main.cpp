@@ -10,11 +10,12 @@ int main(int argc, char **argv)
 {
     Image<int> im = PredefinedImageFactory().GetImage();
 
-    Image<int> resultX = im.Convolve(3, sobelX);
-    Image<int> resultY = im.Convolve(3, sobelY);
+    Image<int> resultX = im.GetConvolved(3, sobelX);
+    Image<int> resultY = im.GetConvolved(3, sobelY);
     Image<int> gradient = Image<int>::CombineImages(resultX, resultY, CombineGradients<int>);
     Image<int> direction = Image<int>::CombineImages(resultX, resultY, GradientDirection<int>);
     Image<int> result = FindLocalMaxima(gradient, direction);
+    result.ApplyThreshold(10, 9);
 
     std::cout << gradient;
     std::cout << "-------" << std::endl;

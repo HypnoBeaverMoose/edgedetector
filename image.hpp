@@ -27,11 +27,17 @@ public:
 
     int GetHeight() const;
 
-    Image<T> Convolve(int size, T *kernel) const;
+    Image<T> GetConvolved(int size, T *kernel) const;
+
+    void Normalize(T maximum);
+
+    void ApplyThreshold(T normalizer, T threshold);
 
     static Image<T> CombineImages(const Image &left, const Image &right, std::function<T(T, T)> func);
 
 private:
+    T NormalizeElement(T element, T normalizer);
+
     std::vector<T> _data;
     int _width;
     int _height;
