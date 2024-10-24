@@ -31,8 +31,8 @@ Image FindLocalMaxima(const Image &gradient, const Image &direction)
 {
     if (gradient.GetHeight() != direction.GetHeight() || gradient.GetWidth() != direction.GetWidth())
     {
-        std::cout << "Error: Gradient and Direction images do not match";
-        return Image();
+        std::cout << "Error: Gradient and Direction images of different dimensions.";
+        exit(1);
     }
 
     int width = gradient.GetWidth();

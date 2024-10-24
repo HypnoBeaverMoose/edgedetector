@@ -3,16 +3,12 @@
 #include "image.hpp"
 #include <algorithm>
 
-Image::Image(int width, int height, const std::vector<int> &input) : _width(width), _height(height), _data(input)
-{
-}
-
 Image Image::CombineImages(const Image &left, const Image &right, std::function<int(int, int)> func)
 {
     if (left._width != right._width || left._height != right._height)
     {
-        std::cout << "Images of different sizes";
-        return Image(0, 0, std::vector<int>());
+        std::cerr << "Error: Trying to combine images of different dimensions.";
+        exit(1);
     }
 
     int height = left._height, width = left._width;
@@ -48,7 +44,7 @@ int Image::GetPixel(int x, int y, OverflowStrategy overflow, int def) const
         }
         else if (x > _width - 1)
         {
-            x = _width - 1 - (x - (_width - 1));
+            x = 2 * _width - 2 - x;
         }
         if (y < 0)
         {
@@ -56,19 +52,19 @@ int Image::GetPixel(int x, int y, OverflowStrategy overflow, int def) const
         }
         else if (y > _height - 1)
         {
-            y = _height - 1 - (y - (_height - 1)); // TODO: Expand
+            y = 2 * _height - 2 - y;
         }
         break;
     default:
         break;
     }
 
-    return _data.at(y * _width + x); // _data[y * _width + x];
+    return _data.at(y * _width + x);
 }
 
 void Image::SetPixel(int x, int y, int value)
 {
-    _data.at(y * _width + x) = value; // _data[y * _width + x] = value;
+    _data.at(y * _width + x) = value;
 }
 
 int Image::GetWidth() const { return _width; }

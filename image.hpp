@@ -16,7 +16,7 @@ public:
 
     Image(int width, int height) : _width(width), _height(height), _data(width * height) {};
 
-    Image(int width, int height, const std::vector<int> &input);
+    Image::Image(int width, int height, const std::vector<int> &input) : _width(width), _height(height), _data(input) {}
 
     int GetPixel(int x, int y, OverflowStrategy overflow = DEFAULT, int def = 0) const;
 
