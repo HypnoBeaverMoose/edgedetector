@@ -5,10 +5,10 @@
 
 int main(int argc, char **argv)
 {
-    Image<float> input = TgaImageFactory("input.tga").GetImage();
-    EdgeDetector<float> edgeDetector("debug/");
+    Image<float> input = TgaImageFactory("images/input.tga").GetImage();
 
-    Image<float> result = edgeDetector.FindEdges(input, 0.05f, 2);
+    EdgeDetector<float> edgeDetector(true);
+    Image<float> result = edgeDetector.FindEdges(input, 0.25f, 1.0f, 2);
 
     auto edgePixels = result.FindNonZeroPixels();
     for (auto &pixel : edgePixels)

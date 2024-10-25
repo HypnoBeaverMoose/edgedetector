@@ -1,6 +1,7 @@
 #include "image.hpp"
 #include "edge-detector.hpp"
 #include "kernel.hpp"
+#include "file-utils.hpp"
 #include <algorithm>
 #include <iostream>
 
@@ -40,14 +41,33 @@ template <typename T>
 Image<T> EdgeDetector<T>::FindEdges(const Image<T> &input, T threshold, T edgeStrength, float blurStrength) const
 {
     Image<T> blurred = ApplyBlur(input, blurStrength);
+    if (_debug)
+    {
+        FileUtils::SaveImage(blurred, _debugPath + "blurred.tga");
+    }
 
     std::tuple<Image<T>, Image<T>> filtered = ApplyFilter(blurred);
 
     Image<T> result = FindInitialEdges(std::get<0>(filtered), std::get<1>(filtered));
 
+    if (_debug)
+    {
+        FileUtils::SaveImage(result, _debugPath + "initial-edges.tga");
+    }
+
     result.ApplyDoubleThreshold(threshold / 4, threshold, edgeStrength);
 
+    if (_debug)
+    {
+        FileUtils::SaveImage(result, _debugPath + "threshold.tga");
+    }
+
     result = TrackEdges(result, edgeStrength);
+
+    if (_debug)
+    {
+        FileUtils::SaveImage(result, _debugPath + "final.tga");
+    }
 
     return result;
 }
@@ -56,7 +76,19 @@ template <typename T>
 Image<T> EdgeDetector<T>::FindInitialEdges(const Image<T> &resultX, const Image<T> &resultY) const
 {
     Image<T> gradient = Image<float>::CombineImages(resultX, resultY, CombineGradients<T>);
+
+    if (_debug)
+    {
+        FileUtils::SaveImage(gradient, _debugPath + "gradient.tga");
+    }
+
     Image<T> direction = Image<float>::CombineImages(resultX, resultY, FindGradientDirection<T>);
+
+    if (_debug)
+    {
+        FileUtils::SaveImage(direction, _debugPath + "direction.tga");
+    }
+
     return FindLocalMaxima(gradient, direction);
 }
 

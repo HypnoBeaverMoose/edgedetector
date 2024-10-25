@@ -6,7 +6,7 @@ template <typename T>
 class EdgeDetector
 {
 public:
-    EdgeDetector(std::string debugPath) : _debugPath(debugPath) {};
+    EdgeDetector(bool debug = false, std::string debugPath = "images/debug-images/") : _debugPath(debugPath), _debug(debug) {};
 
     Image<T> FindEdges(const Image<T> &input, T threshold, T edgeStrength, float blurStrength) const;
 
@@ -24,4 +24,5 @@ private:
     T DetermineEdgeValue(const Image<T> &input, int x, int y, T edgeValue) const;
 
     std::string _debugPath;
+    bool _debug;
 };
