@@ -1,4 +1,5 @@
 *.dSYM
 *.out
 bin/
+images/
 .DS_Store
