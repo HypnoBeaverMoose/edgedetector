@@ -46,6 +46,6 @@ public:
     }
 };
 
-Kernel<float, 3> SobelX((float[3]){0.5f, 0, -0.5f}, (float[3]){0.25f, 0.5f, 0.25f});
-Kernel<float, 3> SobelY((float[3]){0.25f, 0.5f, 0.25f}, (float[3]){0.5f, 0, -0.5f});
+Kernel<float, 3> SobelX((float[3]){1, 0, -1}, (float[3]){1, 2, 1});
+Kernel<float, 3> SobelY((float[3]){1, 2, 1}, (float[3]){1, 0, -1});
 Gaussian<5> Gaussian5(2);
