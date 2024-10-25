@@ -52,7 +52,7 @@ std::vector<Coord> FindNonZeroPixels(const Image<T> &image)
         {
             if (image.GetPixel(x, y) > 0)
             {
-                result.push_back(Coord(x,y));
+                result.push_back(Coord(x, y));
             }
         }
     }
@@ -99,4 +99,51 @@ Image<T> FindLocalMaxima(const Image<T> &gradient, const Image<T> &direction)
         }
     }
     return result;
+}
+
+template <typename T>
+Image<T> EdgeTracking(const Image<T> &input, T edgeValue)
+{
+    int width = input.GetWidth();
+    int height = input.GetHeight();
+
+    Image<T> result(width, height);
+
+    for (int y = 0; y < height; y++)
+    {
+        for (int x = 0; x < width; x++)
+        {
+            result.SetPixel(x, y, DetermineEdgeValue(input, x, y, edgeValue));
+        }
+    }
+    return result;
+}
+
+template <typename T>
+T DetermineEdgeValue(const Image<T> &input, int x, int y, T edgeValue)
+{
+    T val = input.GetPixel(x, y, Image<T>::CLAMP);
+    if (!(val > 0 && val < edgeValue))
+    {
+        return val;
+    }
+
+    for (int offset_y = -1; offset_y <= 1; offset_y++)
+    {
+        for (int offset_x = -1; offset_x <= 1; offset_x++)
+        {
+            int realX = x + offset_x;
+            int realY = y + offset_y;
+            if (offset_x > 0 && offset_y > 0)
+            {
+                T pixel = input.GetPixel(realX, realY, Image<T>::CLAMP);
+                if (std::abs(pixel - edgeValue) < std::numeric_limits<T>::epsilon())
+                {
+                    return edgeValue;
+                }
+            }
+        }
+    }
+
+    return 0;
 }
