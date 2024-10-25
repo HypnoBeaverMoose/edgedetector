@@ -31,6 +31,8 @@ public:
 
     Image<T> GetConvolvedSeparable(const std::vector<T> &kernelX, const std::vector<T> &kernelY) const;
 
+    std::vector<std::tuple<int, int>> FindNonZeroPixels() const;
+
     void Normalize(T maximum);
 
     void ApplyDoubleThreshold(T low, T high, T max);

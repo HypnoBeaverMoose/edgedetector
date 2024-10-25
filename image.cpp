@@ -162,7 +162,8 @@ void Image<T>::ApplyDoubleThreshold(T low, T high, T max)
 {
     for (auto &&pixel : _data)
     {
-        pixel = pixel < low ? 0 : pixel > high ? max : pixel;
+        pixel = pixel < low ? 0 : pixel > high ? max
+                                               : pixel;
     }
 }
 
@@ -176,6 +177,21 @@ template <>
 int Image<int>::NormalizeElement(int element, int normalizer)
 {
     return std::round(element / (float)normalizer);
+}
+
+template <typename T>
+std::vector<std::tuple<int, int>> Image<T>::FindNonZeroPixels() const
+{
+    std::vector<std::tuple<int, int>> result;
+    for (size_t i = 0; i < _data.size(); i++)
+    {
+        if (_data[i] > 0)
+        {
+            result.push_back({i / _width, i % _width});
+        }
+    }
+
+    return result;
 }
 
 template class Image<int>;

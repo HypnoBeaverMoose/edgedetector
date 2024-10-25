@@ -1,25 +1,18 @@
 #include <iostream>
-#include <vector>
-#include "kernel.hpp"
-#include "image.hpp"
-#include "processing.hpp"
+#include "edge-detector.hpp"
 #include "image-factory.hpp"
 #include "file-utils.hpp"
 
 int main(int argc, char **argv)
 {
-    Image<float> im = TgaImageFactory("input.tga").GetImage();
-    Image<float> blurred = im.GetConvolvedSeparable(Gaussian5.GetHorizontal(), Gaussian5.GetGetVertical());
-    Image<float> resultX = blurred.GetConvolvedSeparable(SobelX.GetHorizontal(), SobelX.GetGetVertical());
-    Image<float> resultY = blurred.GetConvolvedSeparable(SobelY.GetHorizontal(), SobelY.GetGetVertical());
+    Image<float> input = TgaImageFactory("input.tga").GetImage();
+    EdgeDetector<float> edgeDetector("debug/");
 
-    Image<float> gradient = Image<float>::CombineImages(resultX, resultY, CombineGradients<float>);
-    Image<float> direction = Image<float>::CombineImages(resultX, resultY, GradientDirection<float>);
-    Image<float> result = FindLocalMaxima(gradient, direction);
+    Image<float> result = edgeDetector.FindEdges(input, 0.05f, 2);
 
-    result.ApplyDoubleThreshold(0.005f, 0.03f, 1.0f);
-    result = EdgeTracking(result, 1.0f);
-
-    // // gradient.Normalize(1.0f);
-    FileUtils::SaveImage(result, "output.tga");
+    auto edgePixels = result.FindNonZeroPixels();
+    for (auto &pixel : edgePixels)
+    {
+        std::cout << std::get<0>(pixel) << " " << std::get<1>(pixel) << std::endl;
+    }
 }

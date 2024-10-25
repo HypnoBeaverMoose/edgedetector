@@ -1,23 +1,17 @@
-#pragma once
 #include "image.hpp"
+#include "edge-detector.hpp"
+#include "kernel.hpp"
 #include <algorithm>
 #include <iostream>
-
-struct Coord
-{
-    Coord(int x, int y) : X(x), Y(y) {}
-
-    int X;
-    int Y;
-};
 
 int offsets[4][2] = {{0, 1}, {1, 1}, {1, 0}, {1, -1}};
 
 template <typename T>
 T FindGradientDirection(T left, T right)
 {
-    float deg = (std::atan2((float)left, (float)right) * 57.2958);
+    T deg = (std::atan2(left, right) * 57.2958);
     deg = deg / 45.0f;
+
     int index = std::round(deg);
     if (index < 0)
     {
@@ -27,7 +21,7 @@ T FindGradientDirection(T left, T right)
     {
         index = 0;
     }
-    return index;
+    return (T)index;
 }
 
 template <typename T>
@@ -43,24 +37,46 @@ T Difference(T left, T right)
 }
 
 template <typename T>
-std::vector<Coord> FindNonZeroPixels(const Image<T> &image)
+Image<T> EdgeDetector<T>::FindEdges(const Image<T> &input, T threshold, T edgeStrength, float blurStrength) const
 {
-    std::vector<Coord> result;
-    for (size_t y = 0; y < image.GetHeight(); y++)
-    {
-        for (size_t x = 0; x < image.GetWidth(); x++)
-        {
-            if (image.GetPixel(x, y) > 0)
-            {
-                result.push_back(Coord(x, y));
-            }
-        }
-    }
+    Image<T> blurred = ApplyBlur(input, blurStrength);
+
+    std::tuple<Image<T>, Image<T>> filtered = ApplyFilter(blurred);
+
+    Image<T> result = FindInitialEdges(std::get<0>(filtered), std::get<1>(filtered));
+
+    result.ApplyDoubleThreshold(threshold / 4, threshold, edgeStrength);
+
+    result = TrackEdges(result, edgeStrength);
+
     return result;
 }
 
 template <typename T>
-Image<T> FindLocalMaxima(const Image<T> &gradient, const Image<T> &direction)
+Image<T> EdgeDetector<T>::FindInitialEdges(const Image<T> &resultX, const Image<T> &resultY) const
+{
+    Image<T> gradient = Image<float>::CombineImages(resultX, resultY, CombineGradients<T>);
+    Image<T> direction = Image<float>::CombineImages(resultX, resultY, FindGradientDirection<T>);
+    return FindLocalMaxima(gradient, direction);
+}
+
+template <typename T>
+std::tuple<Image<T>, Image<T>> EdgeDetector<T>::ApplyFilter(const Image<T> &input) const
+{
+    Image<T> resultX = input.GetConvolvedSeparable(SobelX.GetHorizontal(), SobelX.GetGetVertical());
+    Image<T> resultY = input.GetConvolvedSeparable(SobelY.GetHorizontal(), SobelY.GetGetVertical());
+    return {resultX, resultY};
+}
+
+template <typename T>
+Image<T> EdgeDetector<T>::ApplyBlur(const Image<T> &input, float blurStrength) const
+{
+    Gaussian<10> gaussian(blurStrength);
+    return input.GetConvolvedSeparable(gaussian.GetHorizontal(), gaussian.GetGetVertical());
+}
+
+template <typename T>
+Image<T> EdgeDetector<T>::FindLocalMaxima(const Image<T> &gradient, const Image<T> &direction) const
 {
     if (gradient.GetHeight() != direction.GetHeight() || gradient.GetWidth() != direction.GetWidth())
     {
@@ -102,7 +118,7 @@ Image<T> FindLocalMaxima(const Image<T> &gradient, const Image<T> &direction)
 }
 
 template <typename T>
-Image<T> TrackEdges(const Image<T> &input, T edgeValue)
+Image<T> EdgeDetector<T>::TrackEdges(const Image<T> &input, T edgeValue) const
 {
     int width = input.GetWidth();
     int height = input.GetHeight();
@@ -120,7 +136,7 @@ Image<T> TrackEdges(const Image<T> &input, T edgeValue)
 }
 
 template <typename T>
-T DetermineEdgeValue(const Image<T> &input, int x, int y, T edgeValue)
+T EdgeDetector<T>::DetermineEdgeValue(const Image<T> &input, int x, int y, T edgeValue) const
 {
     T val = input.GetPixel(x, y, Image<T>::CLAMP);
     if (!(val > 0 && val < edgeValue))
@@ -147,3 +163,5 @@ T DetermineEdgeValue(const Image<T> &input, int x, int y, T edgeValue)
 
     return 0;
 }
+
+template class EdgeDetector<float>;
