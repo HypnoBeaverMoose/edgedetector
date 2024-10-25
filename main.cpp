@@ -5,10 +5,23 @@
 
 int main(int argc, char **argv)
 {
-    Image<float> input = TgaImageFactory("images/input.tga").GetImage();
+    std::string filename;
+    float threshold;
+
+    if(argc != 3)
+    {
+        std::cout<<"Usage: edgedetector <filename> <threshold[0-1]>"<<std::endl;
+        exit(1);
+    }
+    else
+    {
+        filename = argv[1];
+        threshold = std::atof(argv[2]);
+    }
+    Image<float> input = TgaImageFactory(filename).GetImage();
 
     EdgeDetector<float> edgeDetector(true);
-    Image<float> result = edgeDetector.FindEdges(input, 0.25f, 1.0f, 2);
+    Image<float> result = edgeDetector.FindEdges(input, threshold, 1.0f, 2);
 
     auto edgePixels = result.FindNonZeroPixels();
     for (auto &pixel : edgePixels)

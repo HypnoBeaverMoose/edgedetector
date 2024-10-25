@@ -6,7 +6,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/bin/${fileWorkspaceFolderBasename}",
-            "args": [""],
+            "args": ["images/input.tga", "0.5"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
