@@ -27,7 +27,9 @@ public:
 
     int GetHeight() const;
 
-    Image<T> GetConvolved(int size, int *kernel) const;
+    Image<T> GetConvolved(const std::vector<T> &kernel) const;
+
+    Image<T> GetConvolvedSeparable(const std::vector<T> &kernelX, const std::vector<T> &kernelY) const;
 
     void Normalize(T maximum);
 

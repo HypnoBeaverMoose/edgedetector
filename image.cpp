@@ -83,10 +83,11 @@ int Image<T>::GetHeight() const
 }
 
 template <typename T>
-Image<T> Image<T>::GetConvolved(int size, int *kernel) const // TODO const int* ?
+Image<T> Image<T>::GetConvolved(const std::vector<T> &kernel) const
 {
     Image result(_width, _height, std::vector<T>(_data.size()));
 
+    int size = kernel.size();
     int halfSize = size / 2;
     for (size_t y = 0; y < _height; y++)
     {
@@ -108,6 +109,44 @@ Image<T> Image<T>::GetConvolved(int size, int *kernel) const // TODO const int* 
 
     return result;
 }
+template <typename T>
+Image<T> Image<T>::GetConvolvedSeparable(const std::vector<T> &kernelX, const std::vector<T> &kernelY) const
+{
+    Image intermediate1(_width, _height);
+    Image intermediate2(_width, _height);
+
+    int size = kernelX.size();
+    int halfSize = size / 2;
+    for (size_t y = 0; y < _height; y++)
+    {
+        for (size_t x = 0; x < _width; x++)
+        {
+            T sum = 0;
+            for (size_t kernelOffset = 0; kernelOffset < size; kernelOffset++)
+            {
+                int offsetX = x + kernelOffset - halfSize;
+                sum += kernelX[kernelOffset] * GetPixel(offsetX, y, CLAMP);
+            }
+            intermediate1.SetPixel(x, y, sum);
+        }
+    }
+
+    for (size_t y = 0; y < _height; y++)
+    {
+        for (size_t x = 0; x < _width; x++)
+        {
+            T sum = 0;
+            for (size_t kernelOffset = 0; kernelOffset < size; kernelOffset++)
+            {
+                int offsetY = y + kernelOffset - halfSize;
+                sum += kernelY[kernelOffset] * intermediate1.GetPixel(x, offsetY, CLAMP);
+            }
+            intermediate2.SetPixel(x, y, sum);
+        }
+    }
+    return intermediate2;
+}
+
 template <typename T>
 void Image<T>::Normalize(T normalizer)
 {

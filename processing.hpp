@@ -37,6 +37,12 @@ T CombineGradients(T left, T right)
 }
 
 template <typename T>
+T Difference(T left, T right)
+{
+    return std::abs(left - right);
+}
+
+template <typename T>
 std::vector<Coord> FindNonZeroPixels(const Image<T> &image)
 {
     std::vector<Coord> result;
