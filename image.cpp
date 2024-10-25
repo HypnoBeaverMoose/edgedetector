@@ -158,13 +158,11 @@ void Image<T>::Normalize(T normalizer)
 }
 
 template <typename T>
-void Image<T>::ApplyThreshold(T normalizer, T threshold)
+void Image<T>::ApplyDoubleThreshold(T low, T high, T max)
 {
-    T max = *std::max_element(_data.begin(), _data.end());
-    for (size_t i = 0; i < _data.size(); i++)
+    for (auto &&pixel : _data)
     {
-        T normalized = NormalizeElement(_data[i], max) * normalizer;
-        _data[i] = normalized > threshold ? normalizer : 0;
+        pixel = pixel < low ? 0 : pixel > high ? max : pixel;
     }
 }
 
