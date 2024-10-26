@@ -105,7 +105,7 @@ void EdgeDetector<T>::ApplyFilter(Image<T> &filterX, Image<T> &filterY) const
 template <typename T>
 void EdgeDetector<T>::ApplyBlur(Image<T> &input, float blurStrength) const
 {
-    Gaussian<10> gaussian(blurStrength);
+    Gaussian<5> gaussian(blurStrength);
     return input.Convolve(gaussian.GetHorizontal(), gaussian.GetGetVertical());
 }
 
