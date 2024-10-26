@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <filesystem>
 
 Image<float> FileUtils::LoadImage(std::string filename)
 {
@@ -12,9 +13,9 @@ Image<float> FileUtils::LoadImage(std::string filename)
         exit(1);
     }
 
-    char header[18] = {0};
+    unsigned char header[18] = {0};
     // Read header
-    file.read(header, sizeof(header));
+    file.read((char *)header, sizeof(header));
     if (!file)
     {
         std::cerr << "Error reading header" << std::endl;
@@ -26,7 +27,7 @@ Image<float> FileUtils::LoadImage(std::string filename)
     int channels = header[16] / 8;
 
     std::vector<unsigned char> data(width * height * channels);
-    file.read((char*)data.data(), data.size());
+    file.read((char *)data.data(), data.size());
     if (!file)
     {
         std::cerr << "Error reading data" << std::endl;
@@ -71,7 +72,7 @@ void FileUtils::SaveImage(Image<float> image, std::string filename)
         exit(1);
     }
 
-    char header[18] = {0};
+    unsigned char header[18] = {0};
     header[2] = 2;
     header[12] = image.GetWidth() & 0xFF;
     header[13] = (image.GetWidth() >> 8) & 0xFF;
@@ -80,7 +81,7 @@ void FileUtils::SaveImage(Image<float> image, std::string filename)
     header[16] = 24;
 
     // Write header
-    file.write(header, sizeof(header));
+    file.write((char *)header, sizeof(header));
     if (!file)
     {
         std::cerr << "Error writing header" << std::endl;
@@ -89,7 +90,7 @@ void FileUtils::SaveImage(Image<float> image, std::string filename)
     }
 
     // Write pixel data
-    file.write((char*)(data.data()), data.size());
+    file.write((char *)(data.data()), data.size());
     if (!file)
     {
         std::cerr << "Error writing pixel data" << std::endl;
