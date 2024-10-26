@@ -59,6 +59,7 @@ Image<float> FileUtils::LoadImage(std::string filename)
         result.push_back(intensity);
     }
 
+    file.close();
     return Image<float>(header.width, header.height, result);
 }
 
@@ -103,7 +104,9 @@ void FileUtils::SaveImage(Image<float> image, std::string filename)
     if (!file)
     {
         std::cerr << "Error writing pixel data" << std::endl;
-        file.close();
+        file.close(); 
         exit(1);
     }
+
+    file.close();
 }

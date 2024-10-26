@@ -6,7 +6,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/bin/${fileWorkspaceFolderBasename}",
-            "args": ["images/input.tga", "0.5"],
+            "args": ["images/input.tga", "0.08"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
@@ -14,7 +14,7 @@
             "MIMode": "lldb",
             "preLaunchTask": "${defaultBuildTask}",
             "logging": {
-                "moduleLoad": false,
+                "moduleLoad": false, 
                 "trace": true,
                 "exceptions": true
             }
