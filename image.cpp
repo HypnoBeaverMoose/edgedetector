@@ -164,7 +164,8 @@ void Image<T>::Convolve(const std::vector<T> &kernelX, const std::vector<T> &ker
             for (int kernelOffset = -halfSize; kernelOffset <= halfSize; kernelOffset++)
             {
                 int offsetX = x + kernelOffset;
-                sum += kernelX[kernelOffset + halfSize] * GetPixel(offsetX, y, CLAMP);
+                offsetX = std::max(0, std::min(offsetX, _width - 1));
+                sum += kernelX[kernelOffset + halfSize] * _data[y * _width + offsetX];
             }
             buffer[x] = sum;
         }
@@ -183,7 +184,8 @@ void Image<T>::Convolve(const std::vector<T> &kernelX, const std::vector<T> &ker
             for (int kernelOffset = -halfSize; kernelOffset <= halfSize; kernelOffset++)
             {
                 int offsetY = y + kernelOffset;
-                sum += kernelY[kernelOffset + halfSize] * GetPixel(x, offsetY, CLAMP);
+                offsetY = std::max(0, std::min(offsetY, _height - 1));
+                sum += kernelY[kernelOffset + halfSize] * _data[offsetY * _width + x];
             }
             buffer[y] = sum;
         }
