@@ -4,9 +4,9 @@
 #include <algorithm>
 
 template <typename T>
-Image<T> Image<T>::CombineImages(const Image<T> &left, const Image<T> &right, std::function<T(T, T)> func)
+void Image<T>::CombineImages(const Image<T> &left, const Image<T> &right, Image<T>& result, std::function<T(T, T)> func)
 {
-    if (left._width != right._width || left._height != right._height)
+    if (left._width != right._width || left._height != right._height || left._width != result._width || left._height != result._height)
     {
         std::cerr << "Error: Trying to combine images of different dimensions.";
         exit(1);
@@ -14,14 +14,10 @@ Image<T> Image<T>::CombineImages(const Image<T> &left, const Image<T> &right, st
 
     int height = left._height, width = left._width;
 
-    Image result(width, height, std::vector<T>(left._data.size()));
-
     for (size_t i = 0; i < left._data.size(); i++)
     {
         result._data[i] = func(left._data[i], right._data[i]);
     }
-
-    return result;
 }
 
 template <typename T>

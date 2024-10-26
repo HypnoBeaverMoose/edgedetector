@@ -39,7 +39,7 @@ public:
 
     void ApplyDoubleThreshold(T low, T high, T max);
 
-    static Image<T> CombineImages(const Image &left, const Image &right, std::function<T(T, T)> func);
+    static void CombineImages(const Image<T> &left, const Image<T> &right, Image<T> &result, std::function<T(T, T)> func);
 
 private:
     T NormalizeElement(T element, T normalizer);

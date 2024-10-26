@@ -10,7 +10,6 @@ int offsets[4][2] = {{0, 1}, {1, 1}, {1, 0}, {1, -1}};
 Kernel<float, 3> SobelX((float[3]){1, 0, -1}, (float[3]){1, 2, 1});
 Kernel<float, 3> SobelY((float[3]){1, 2, 1}, (float[3]){1, 0, -1});
 
-
 template <typename T>
 T FindGradientDirection(T left, T right)
 {
@@ -42,77 +41,74 @@ T Difference(T left, T right)
 }
 
 template <typename T>
-Image<T> EdgeDetector<T>::FindEdges(const Image<T> &input, T threshold, T edgeStrength, float blurStrength) const
+void EdgeDetector<T>::FindEdges(Image<T> &image, T threshold, T edgeStrength, float blurStrength) const
 {
-    Image<T> blurred = ApplyBlur(input, blurStrength);
+    ApplyBlur(image, blurStrength);
     if (_debug)
     {
-        FileUtils::SaveImage(blurred, _debugPath + "blurred.tga");
+        FileUtils::SaveImage(image, _debugPath + "blurred.tga");
     }
 
-    std::tuple<Image<T>, Image<T>> filtered = ApplyFilter(blurred);
+    Image<T> &filterX = image;
+    Image<T> &initialEdges = image;
+    Image<T> filterY(image);
 
-    Image<T> result = FindInitialEdges(std::get<0>(filtered), std::get<1>(filtered));
-
-    if (_debug)
-    {
-        FileUtils::SaveImage(result, _debugPath + "initial-edges.tga");
-    }
-
-    result.ApplyDoubleThreshold(threshold / 4, threshold, edgeStrength);
+    ApplyFilter(filterX, filterY);
+    FindInitialEdges(filterX, filterY, initialEdges);
 
     if (_debug)
     {
-        FileUtils::SaveImage(result, _debugPath + "threshold.tga");
+        FileUtils::SaveImage(initialEdges, _debugPath + "initial-edges.tga");
     }
 
-    result = TrackEdges(result, edgeStrength);
+    initialEdges.ApplyDoubleThreshold(threshold / 4, threshold, edgeStrength);
 
     if (_debug)
     {
-        FileUtils::SaveImage(result, _debugPath + "final.tga");
+        FileUtils::SaveImage(initialEdges, _debugPath + "threshold.tga");
     }
 
-    return result;
+    TrackEdges(initialEdges, image, edgeStrength);
+
+    if (_debug)
+    {
+        FileUtils::SaveImage(initialEdges, _debugPath + "final.tga");
+    }
 }
 
 template <typename T>
-Image<T> EdgeDetector<T>::FindInitialEdges(const Image<T> &resultX, const Image<T> &resultY) const
+void EdgeDetector<T>::FindInitialEdges(const Image<T> &filterX, const Image<T> &filterY, Image<T> &result) const
 {
-    Image<T> gradient = Image<float>::CombineImages(resultX, resultY, CombineGradients<T>);
+    Image<T> gradient(filterX.GetWidth(), filterY.GetHeight()), direction(filterX.GetWidth(), filterY.GetHeight());
+
+    Image<T>::CombineImages(filterX, filterY, gradient, CombineGradients<T>);
+    Image<T>::CombineImages(filterX, filterY, direction, FindGradientDirection<T>);
 
     if (_debug)
     {
         FileUtils::SaveImage(gradient, _debugPath + "gradient.tga");
-    }
-
-    Image<T> direction = Image<float>::CombineImages(resultX, resultY, FindGradientDirection<T>);
-
-    if (_debug)
-    {
         FileUtils::SaveImage(direction, _debugPath + "direction.tga");
     }
 
-    return FindLocalMaxima(gradient, direction);
+    FindLocalMaxima(gradient, direction, result);
 }
 
 template <typename T>
-std::tuple<Image<T>, Image<T>> EdgeDetector<T>::ApplyFilter(const Image<T> &input) const
+void EdgeDetector<T>::ApplyFilter(Image<T> &filterX, Image<T> &filterY) const
 {
-    Image<T> resultX = input.GetConvolvedSeparable(SobelX.GetHorizontal(), SobelX.GetGetVertical());
-    Image<T> resultY = input.GetConvolvedSeparable(SobelY.GetHorizontal(), SobelY.GetGetVertical());
-    return {resultX, resultY};
+    filterX.Convolve(SobelX.GetHorizontal(), SobelX.GetGetVertical());
+    filterY.Convolve(SobelY.GetHorizontal(), SobelY.GetGetVertical());
 }
 
 template <typename T>
-Image<T> EdgeDetector<T>::ApplyBlur(const Image<T> &input, float blurStrength) const
+void EdgeDetector<T>::ApplyBlur(Image<T> &input, float blurStrength) const
 {
     Gaussian<10> gaussian(blurStrength);
-    return input.GetConvolvedSeparable(gaussian.GetHorizontal(), gaussian.GetGetVertical());
+    return input.Convolve(gaussian.GetHorizontal(), gaussian.GetGetVertical());
 }
 
 template <typename T>
-Image<T> EdgeDetector<T>::FindLocalMaxima(const Image<T> &gradient, const Image<T> &direction) const
+void EdgeDetector<T>::FindLocalMaxima(const Image<T> &gradient, const Image<T> &direction, Image<T> &result) const
 {
     if (gradient.GetHeight() != direction.GetHeight() || gradient.GetWidth() != direction.GetWidth())
     {
@@ -122,8 +118,6 @@ Image<T> EdgeDetector<T>::FindLocalMaxima(const Image<T> &gradient, const Image<
 
     int width = gradient.GetWidth();
     int height = gradient.GetHeight();
-
-    Image<T> result(width, height);
 
     for (size_t y = 0; y < height; y++)
     {
@@ -150,16 +144,13 @@ Image<T> EdgeDetector<T>::FindLocalMaxima(const Image<T> &gradient, const Image<
             }
         }
     }
-    return result;
 }
 
 template <typename T>
-Image<T> EdgeDetector<T>::TrackEdges(const Image<T> &input, T edgeValue) const
+void EdgeDetector<T>::TrackEdges(const Image<T> &input, Image<T> &result, T edgeValue) const
 {
     int width = input.GetWidth();
     int height = input.GetHeight();
-
-    Image<T> result(width, height);
 
     for (int y = 0; y < height; y++)
     {
@@ -168,7 +159,6 @@ Image<T> EdgeDetector<T>::TrackEdges(const Image<T> &input, T edgeValue) const
             result.SetPixel(x, y, DetermineEdgeValue(input, x, y, edgeValue));
         }
     }
-    return result;
 }
 
 template <typename T>
