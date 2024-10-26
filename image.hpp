@@ -23,6 +23,10 @@ public:
 
     T GetPixel(int x, int y, OverflowStrategy overflow = DEFAULT, T def = 0) const;
 
+    T GetPixelUnsafe(int x, int y) const { return _data[y * _width + x]; }
+
+    void SetPixelUnsafe(int x, int y, T value) { _data[y * _width + x] = value; }
+
     void SetPixel(int x, int y, T value);
 
     int GetWidth() const;

@@ -123,7 +123,7 @@ void EdgeDetector<T>::FindLocalMaxima(const Image<T> &gradient, const Image<unsi
     {
         for (size_t x = 0; x < width; x++)
         {
-            unsigned char directionIndex = direction.GetPixel(x, y);
+            unsigned char directionIndex = direction.GetPixelUnsafe(x, y);
             int positiveX = x + offsets[directionIndex][0];
             int positiveY = y + offsets[directionIndex][1];
 
@@ -132,15 +132,16 @@ void EdgeDetector<T>::FindLocalMaxima(const Image<T> &gradient, const Image<unsi
 
             T before = gradient.GetPixel(positiveX, positiveY);
             T after = gradient.GetPixel(negativeX, negativeY);
-            T current = gradient.GetPixel(x, y);
+
+            T current = gradient.GetPixelUnsafe(x, y);
 
             if (current >= before && current > after)
             {
-                result.SetPixel(x, y, current);
+                result.SetPixelUnsafe(x, y, current);
             }
             else
             {
-                result.SetPixel(x, y, 0);
+                result.SetPixelUnsafe(x, y, 0);
             }
         }
     }
@@ -156,7 +157,7 @@ void EdgeDetector<T>::TrackEdges(const Image<T> &input, Image<T> &result, T edge
     {
         for (int x = 0; x < width; x++)
         {
-            result.SetPixel(x, y, DetermineEdgeValue(input, x, y, edgeValue));
+            result.SetPixelUnsafe(x, y, DetermineEdgeValue(input, x, y, edgeValue));
         }
     }
 }

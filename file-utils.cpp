@@ -69,7 +69,7 @@ void FileUtils::SaveImage(Image<float> image, std::string filename)
     {
         for (size_t x = 0; x < image.GetWidth(); x++)
         {
-            unsigned char pixel = (unsigned char)(image.GetPixel(x, y) * 255);
+            unsigned char pixel = (unsigned char)(image.GetPixelUnsafe(x, y) * 255);
             data.push_back(pixel);
             data.push_back(pixel);
             data.push_back(pixel);
