@@ -3,24 +3,6 @@
 #include <fstream>
 #include <vector>
 
-#pragma pack(push, 1) // TODO::Will this work on other compilers?
-struct Header
-{
-    char idLength;
-    char colorMapType;
-    char imageType;
-    short colorMapOrigin;
-    short colorMapOrigin2;
-    char colorMapDepth;
-    short xOrigin;
-    short yOrigin;
-    short width;
-    short height;
-    char pixelDepth;
-    char imageDescriptor;
-};
-#pragma pack(pop)
-
 Image<float> FileUtils::LoadImage(std::string filename)
 {
     std::ifstream file(filename, std::ios::binary);
@@ -30,16 +12,21 @@ Image<float> FileUtils::LoadImage(std::string filename)
         exit(1);
     }
 
-    Header header;
+    char header[18] = {0};
     // Read header
-    file.read(reinterpret_cast<char *>(&header), sizeof(header));
+    file.read(header, sizeof(header));
     if (!file)
     {
         std::cerr << "Error reading header" << std::endl;
         exit(1);
     }
-    std::vector<unsigned char> data(header.width * header.height * (header.pixelDepth / 8));
-    file.read(reinterpret_cast<char *>(data.data()), data.size());
+
+    int width = (header[13] << 8) + header[12];
+    int height = (header[15] << 8) + header[14];
+    int channels = header[16] / 8;
+
+    std::vector<unsigned char> data(width * height * channels);
+    file.read((char*)data.data(), data.size());
     if (!file)
     {
         std::cerr << "Error reading data" << std::endl;
@@ -53,13 +40,13 @@ Image<float> FileUtils::LoadImage(std::string filename)
         int channel = i * 3;
         float intensity = ((float)data[channel] +
                            (float)data[channel + 1] + (float)data[channel + 2]) /
-                          (3.0f * 255);
+                          (channels * 255.0f);
 
         result.push_back(intensity);
     }
 
     file.close();
-    return Image<float>(header.width, header.height, std::move(result));
+    return Image<float>(width, height, std::move(result));
 }
 
 void FileUtils::SaveImage(Image<float> image, std::string filename)
@@ -83,14 +70,17 @@ void FileUtils::SaveImage(Image<float> image, std::string filename)
         file.close();
         exit(1);
     }
-    Header header = {0};
-    header.imageType = 2;
-    header.width = image.GetWidth();
-    header.height = image.GetHeight();
-    header.pixelDepth = 24;
+
+    char header[18] = {0};
+    header[2] = 2;
+    header[12] = image.GetWidth() & 0xFF;
+    header[13] = (image.GetWidth() >> 8) & 0xFF;
+    header[14] = image.GetHeight() & 0xFF;
+    header[15] = (image.GetHeight() >> 8) & 0xFF;
+    header[16] = 24;
 
     // Write header
-    file.write(reinterpret_cast<const char *>(&header), sizeof(header));
+    file.write(header, sizeof(header));
     if (!file)
     {
         std::cerr << "Error writing header" << std::endl;
@@ -99,11 +89,11 @@ void FileUtils::SaveImage(Image<float> image, std::string filename)
     }
 
     // Write pixel data
-    file.write(reinterpret_cast<const char *>(data.data()), data.size());
+    file.write((char*)(data.data()), data.size());
     if (!file)
     {
         std::cerr << "Error writing pixel data" << std::endl;
-        file.close(); 
+        file.close();
         exit(1);
     }
 
