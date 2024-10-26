@@ -10,10 +10,10 @@ int offsets[4][2] = {{0, 1}, {1, 1}, {1, 0}, {1, -1}};
 Kernel<float, 3> SobelX((float[3]){1, 0, -1}, (float[3]){1, 2, 1});
 Kernel<float, 3> SobelY((float[3]){1, 2, 1}, (float[3]){1, 0, -1});
 
-template <typename T>
-T FindGradientDirection(T left, T right)
+template <typename TRet, typename TLeft, typename TRight>
+TRet FindGradientDirection(TLeft left, TRight right)
 {
-    T deg = (std::atan2(left, right) * 57.2958);
+    TRet deg = (std::atan2(left, right) * 57.2958);
     deg = deg / 45.0f;
 
     int index = std::round(deg);
@@ -25,17 +25,17 @@ T FindGradientDirection(T left, T right)
     {
         index = 0;
     }
-    return (T)index;
+    return (TRet)index;
 }
 
-template <typename T>
-T CombineGradients(T left, T right)
+template <typename TRet, typename TLeft, typename TRight>
+TRet CombineGradients(TLeft left, TRight right)
 {
     return std::sqrt(left * left + right * right);
 }
 
-template <typename T>
-T Difference(T left, T right)
+template <typename TRet, typename TLeft, typename TRight>
+TRet Difference(TLeft left, TRight right)
 {
     return std::abs(left - right);
 }
@@ -81,8 +81,8 @@ void EdgeDetector<T>::FindInitialEdges(const Image<T> &filterX, const Image<T> &
 {
     Image<T> gradient(filterX.GetWidth(), filterY.GetHeight()), direction(filterX.GetWidth(), filterY.GetHeight());
 
-    Image<T>::CombineImages(filterX, filterY, gradient, CombineGradients<T>);
-    Image<T>::CombineImages(filterX, filterY, direction, FindGradientDirection<T>);
+    CombineImages<T, T, T>(filterX, filterY, gradient, CombineGradients<T,T,T>);
+    CombineImages<T, T, T>(filterX, filterY, direction, FindGradientDirection<T,T,T>);
 
     if (_debug)
     {

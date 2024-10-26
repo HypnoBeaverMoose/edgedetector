@@ -41,7 +41,8 @@ public:
 
     void ApplyDoubleThreshold(T low, T high, T max);
 
-    static void CombineImages(const Image<T> &left, const Image<T> &right, Image<T> &result, std::function<T(T, T)> func);
+    template <typename TRet, typename TLeft, typename TRight>
+    friend void CombineImages(const Image<TLeft> &left, const Image<TRight> &right, Image<TRet> &result, std::function<TRet(TLeft, TRight)> func);
 
 private:
     T NormalizeElement(T element, T normalizer);
@@ -50,6 +51,23 @@ private:
     int _width;
     int _height;
 };
+
+template <typename TRet, typename TLeft, typename TRight>
+void CombineImages(const Image<TLeft> &left, const Image<TRight> &right, Image<TRet> &result, std::function<TRet(TLeft, TRight)> func)
+{
+    if (left._width != right._width || left._height != right._height || left._width != result._width || left._height != result._height)
+    {
+        std::cerr << "Error: Trying to combine images of different dimensions.";
+        exit(1);
+    }
+
+    int height = left._height, width = left._width;
+
+    for (size_t i = 0; i < left._data.size(); i++)
+    {
+        result._data[i] = func(left._data[i], right._data[i]);
+    }
+}
 
 template <typename T>
 std::ostream &operator<<(std::ostream &strm, const Image<T> &a)

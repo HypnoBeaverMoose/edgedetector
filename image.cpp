@@ -4,23 +4,6 @@
 #include <algorithm>
 
 template <typename T>
-void Image<T>::CombineImages(const Image<T> &left, const Image<T> &right, Image<T>& result, std::function<T(T, T)> func)
-{
-    if (left._width != right._width || left._height != right._height || left._width != result._width || left._height != result._height)
-    {
-        std::cerr << "Error: Trying to combine images of different dimensions.";
-        exit(1);
-    }
-
-    int height = left._height, width = left._width;
-
-    for (size_t i = 0; i < left._data.size(); i++)
-    {
-        result._data[i] = func(left._data[i], right._data[i]);
-    }
-}
-
-template <typename T>
 T Image<T>::GetPixel(int x, int y, OverflowStrategy overflow, T def) const
 {
     switch (overflow)
@@ -141,7 +124,7 @@ Image<T> Image<T>::GetConvolvedSeparable(const std::vector<T> &kernelX, const st
             intermediate2.SetPixel(x, y, sum);
         }
     }
-    return  intermediate2;
+    return intermediate2;
 }
 
 template <typename T>
