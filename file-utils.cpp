@@ -59,7 +59,7 @@ Image<float> FileUtils::LoadImage(std::string filename)
     }
 
     file.close();
-    return Image<float>(header.width, header.height, result);
+    return Image<float>(header.width, header.height, std::move(result));
 }
 
 void FileUtils::SaveImage(Image<float> image, std::string filename)

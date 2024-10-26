@@ -81,7 +81,7 @@ int Image<T>::GetHeight() const
 template <typename T>
 Image<T> Image<T>::GetConvolved(const std::vector<T> &kernel) const
 {
-    Image result(_width, _height, std::vector<T>(_data.size()));
+    Image result(_width, _height);
 
     int size = kernel.size();
     int halfSize = size / 2;
@@ -141,7 +141,7 @@ Image<T> Image<T>::GetConvolvedSeparable(const std::vector<T> &kernelX, const st
             intermediate2.SetPixel(x, y, sum);
         }
     }
-    return intermediate2;
+    return  intermediate2;
 }
 
 template <typename T>
