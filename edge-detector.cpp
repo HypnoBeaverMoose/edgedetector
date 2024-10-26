@@ -176,7 +176,7 @@ T EdgeDetector<T>::DetermineEdgeValue(const Image<T> &input, int x, int y, T edg
         {
             int realX = x + offset_x;
             int realY = y + offset_y;
-            if (offset_x > 0 && offset_y > 0)
+            if (offset_x != 0 && offset_y != 0)
             {
                 T pixel = input.GetPixel(realX, realY, Image<T>::CLAMP);
                 if (std::abs(pixel - edgeValue) < std::numeric_limits<T>::epsilon())
