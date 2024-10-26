@@ -66,6 +66,8 @@
         "variant": "cpp",
         "algorithm": "cpp",
         "fstream": "cpp",
-        "iomanip": "cpp"
+        "iomanip": "cpp",
+        "memory_resource": "cpp",
+        "type_traits": "cpp"
     }
 }
