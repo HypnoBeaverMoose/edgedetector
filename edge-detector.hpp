@@ -17,7 +17,7 @@ private:
 
     void FindInitialEdges(const Image<T> &filterX, const Image<T> &filterY, Image<T> &result) const;
 
-    void FindLocalMaxima(const Image<T> &gradient, const Image<T> &direction, Image<T>& result) const;
+    void FindLocalMaxima(const Image<T> &gradient, const Image<unsigned char> &direction, Image<T>& result) const;
 
     void TrackEdges(const Image<T> &input, Image<T>& result, T edgeValue) const;
 

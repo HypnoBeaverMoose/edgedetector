@@ -225,3 +225,4 @@ std::vector<std::tuple<int, int>> Image<T>::FindNonZeroPixels() const
 
 template class Image<int>;
 template class Image<float>;
+template class Image<unsigned char>;

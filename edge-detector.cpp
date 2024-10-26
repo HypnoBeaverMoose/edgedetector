@@ -13,8 +13,8 @@ Kernel<float, 3> SobelY((float[3]){1, 2, 1}, (float[3]){1, 0, -1});
 template <typename TRet, typename TLeft, typename TRight>
 TRet FindGradientDirection(TLeft left, TRight right)
 {
-    TRet deg = (std::atan2(left, right) * 57.2958);
-    deg = deg / 45.0f;
+    TLeft deg = (std::atan2(left, right) * 57.2958);
+    deg = deg / 45;
 
     int index = std::round(deg);
     if (index < 0)
@@ -25,7 +25,7 @@ TRet FindGradientDirection(TLeft left, TRight right)
     {
         index = 0;
     }
-    return (TRet)index;
+    return index;
 }
 
 template <typename TRet, typename TLeft, typename TRight>
@@ -79,15 +79,15 @@ void EdgeDetector<T>::FindEdges(Image<T> &image, T threshold, T edgeStrength, fl
 template <typename T>
 void EdgeDetector<T>::FindInitialEdges(const Image<T> &filterX, const Image<T> &filterY, Image<T> &result) const
 {
-    Image<T> gradient(filterX.GetWidth(), filterY.GetHeight()), direction(filterX.GetWidth(), filterY.GetHeight());
+    Image<T> gradient(filterX.GetWidth(), filterY.GetHeight());
+    Image<unsigned char> direction(filterX.GetWidth(), filterY.GetHeight());
 
     CombineImages<T, T, T>(filterX, filterY, gradient, CombineGradients<T,T,T>);
-    CombineImages<T, T, T>(filterX, filterY, direction, FindGradientDirection<T,T,T>);
+    CombineImages<unsigned char, T, T>(filterX, filterY, direction, FindGradientDirection<unsigned char,T,T>);
 
     if (_debug)
     {
         FileUtils::SaveImage(gradient, _debugPath + "gradient.tga");
-        FileUtils::SaveImage(direction, _debugPath + "direction.tga");
     }
 
     FindLocalMaxima(gradient, direction, result);
@@ -108,7 +108,7 @@ void EdgeDetector<T>::ApplyBlur(Image<T> &input, float blurStrength) const
 }
 
 template <typename T>
-void EdgeDetector<T>::FindLocalMaxima(const Image<T> &gradient, const Image<T> &direction, Image<T> &result) const
+void EdgeDetector<T>::FindLocalMaxima(const Image<T> &gradient, const Image<unsigned char> &direction, Image<T> &result) const
 {
     if (gradient.GetHeight() != direction.GetHeight() || gradient.GetWidth() != direction.GetWidth())
     {
@@ -123,7 +123,7 @@ void EdgeDetector<T>::FindLocalMaxima(const Image<T> &gradient, const Image<T> &
     {
         for (size_t x = 0; x < width; x++)
         {
-            int directionIndex = (int)direction.GetPixel(x, y);
+            unsigned char directionIndex = direction.GetPixel(x, y);
             int positiveX = x + offsets[directionIndex][0];
             int positiveY = y + offsets[directionIndex][1];
 
