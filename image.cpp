@@ -109,6 +109,7 @@ Image<T> Image<T>::GetConvolved(const std::vector<T> &kernel) const
 
     return result;
 }
+
 template <typename T>
 Image<T> Image<T>::GetConvolvedSeparable(const std::vector<T> &kernelX, const std::vector<T> &kernelY) const
 {
@@ -145,6 +146,53 @@ Image<T> Image<T>::GetConvolvedSeparable(const std::vector<T> &kernelX, const st
         }
     }
     return intermediate2;
+}
+
+template <typename T>
+void Image<T>::Convolve(const std::vector<T> &kernelX, const std::vector<T> &kernelY)
+{
+    std::vector<T> buffer(std::max(_width, _height));
+
+    int size = kernelX.size();
+    int halfSize = size / 2;
+
+    for (size_t y = 0; y < _height; y++)
+    {
+        for (size_t x = 0; x < _width; x++)
+        {
+            T sum = 0;
+            for (int kernelOffset = -halfSize; kernelOffset <= halfSize; kernelOffset++)
+            {
+                int offsetX = x + kernelOffset;
+                sum += kernelX[kernelOffset + halfSize] * GetPixel(offsetX, y, CLAMP);
+            }
+            buffer[x] = sum;
+        }
+
+        for (size_t i = 0; i < _width; i++)
+        {
+            _data[y * _width + i] = buffer[i];
+        }
+    }
+
+    for (size_t x = 0; x < _width; x++)
+    {
+        for (size_t y = 0; y < _height; y++)
+        {
+            T sum = 0;
+            for (int kernelOffset = -halfSize; kernelOffset <= halfSize; kernelOffset++)
+            {
+                int offsetY = y + kernelOffset;
+                sum += kernelY[kernelOffset + halfSize] * GetPixel(x, offsetY, CLAMP);
+            }
+            buffer[y] = sum;
+        }
+
+        for (size_t i = 0; i < _height; i++)
+        {
+            _data[i * _width + x] = buffer[i];
+        }
+    }
 }
 
 template <typename T>
@@ -185,7 +233,7 @@ std::vector<std::tuple<int, int>> Image<T>::FindNonZeroPixels() const
     std::vector<std::tuple<int, int>> result;
     for (size_t i = 0; i < _data.size(); i++)
     {
-        if (_data[i] > 0)
+        if (_data[i] - 0 > std::numeric_limits<T>::epsilon())
         {
             result.push_back({i / _width, i % _width});
         }

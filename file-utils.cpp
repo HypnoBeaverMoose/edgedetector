@@ -31,7 +31,6 @@ Image<float> FileUtils::LoadImage(std::string filename)
     }
 
     Header header;
-    std::cout << sizeof(Header);
     // Read header
     file.read(reinterpret_cast<char *>(&header), sizeof(header));
     if (!file)

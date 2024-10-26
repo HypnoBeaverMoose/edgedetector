@@ -45,7 +45,3 @@ public:
         std::copy(this->_horizontal.begin(), this->_horizontal.end(), this->_vertical.begin());
     }
 };
-
-Kernel<float, 3> SobelX((float[3]){1, 0, -1}, (float[3]){1, 2, 1});
-Kernel<float, 3> SobelY((float[3]){1, 2, 1}, (float[3]){1, 0, -1});
-Gaussian<5> Gaussian5(2);

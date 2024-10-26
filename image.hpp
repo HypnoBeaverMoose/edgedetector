@@ -27,6 +27,8 @@ public:
 
     int GetHeight() const;
 
+    void Convolve(const std::vector<T> &kernelX, const std::vector<T> &kernelY);
+
     Image<T> GetConvolved(const std::vector<T> &kernel) const;
 
     Image<T> GetConvolvedSeparable(const std::vector<T> &kernelX, const std::vector<T> &kernelY) const;

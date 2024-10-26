@@ -7,6 +7,10 @@
 
 int offsets[4][2] = {{0, 1}, {1, 1}, {1, 0}, {1, -1}};
 
+Kernel<float, 3> SobelX((float[3]){1, 0, -1}, (float[3]){1, 2, 1});
+Kernel<float, 3> SobelY((float[3]){1, 2, 1}, (float[3]){1, 0, -1});
+
+
 template <typename T>
 T FindGradientDirection(T left, T right)
 {
