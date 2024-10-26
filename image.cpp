@@ -128,6 +128,85 @@ Image<T> Image<T>::GetConvolvedSeparable(const std::vector<T> &kernelX, const st
 }
 
 template <typename T>
+void Image<T>::ConvolveOptimized(const std::vector<T> &kernelX, const std::vector<T> &kernelY)
+{
+    std::vector<T> buffer(std::max(_width, _height));
+
+    int size = kernelX.size();
+    int halfSize = size / 2;
+
+    for (size_t y = 0; y < _height; y++)
+    {
+        // Handle general case.
+        for (size_t x = halfSize; x < _width - halfSize; x++)
+        {
+            T sum = 0;
+            for (int kernelOffset = -halfSize; kernelOffset <= halfSize; kernelOffset++)
+            {
+                int offsetX = x + kernelOffset;
+                sum += kernelX[kernelOffset + halfSize] * _data[y * _width + offsetX];
+            }
+            buffer[x] = sum;
+        }
+
+        // Handle edge cases for x dimension;
+        for (size_t x = 0; x < halfSize; x++)
+        {
+            T sumLeft = 0, sumRight = 0;
+            for (int kernelOffset = -halfSize; kernelOffset <= halfSize; kernelOffset++)
+            {
+                int offsetLeftX = x + kernelOffset;
+                int offsetRightX = offsetLeftX + _width - halfSize;
+                sumLeft += kernelX[kernelOffset + halfSize] * GetPixel(offsetLeftX, y, CLAMP);
+                sumRight += kernelX[kernelOffset + halfSize] * GetPixel(offsetRightX, y, CLAMP);
+            }
+            buffer[x] = sumLeft;
+            buffer[x + _width - halfSize] = sumRight;
+        }
+
+        for (size_t i = 0; i < _width; i++)
+        {
+            _data[y * _width + i] = buffer[i];
+        }
+    }
+
+    for (size_t x = 0; x < _width; x++)
+    {
+        // Handle general case.
+        for (size_t y = halfSize; y < _height - halfSize; y++)
+        {
+            T sum = 0;
+            for (int kernelOffset = -halfSize; kernelOffset <= halfSize; kernelOffset++)
+            {
+                int offsetY = y + kernelOffset;
+                sum += kernelY[kernelOffset + halfSize] * _data[offsetY * _width + x];
+            }
+            buffer[y] = sum;
+        }
+
+        // Handle edge case for y dimension.
+        for (size_t y = 0; y < halfSize; y++)
+        {
+            T sumTop = 0, sumBottom = 0;
+            for (int kernelOffset = -halfSize; kernelOffset <= halfSize; kernelOffset++)
+            {
+                int offsetYTop = y + kernelOffset;
+                int offsetYBottom = offsetYTop + _height - halfSize;
+                sumTop += kernelY[kernelOffset + halfSize] * GetPixel(x, offsetYTop, CLAMP);
+                sumBottom += kernelY[kernelOffset + halfSize] * GetPixel(x, offsetYBottom, CLAMP);
+            }
+            buffer[y] = sumTop;
+            buffer[y + _height - halfSize] = sumBottom;
+        }
+
+        for (size_t i = 0; i < _height; i++)
+        {
+            _data[i * _width + x] = buffer[i];
+        }
+    }
+}
+
+template <typename T>
 void Image<T>::Convolve(const std::vector<T> &kernelX, const std::vector<T> &kernelY)
 {
     std::vector<T> buffer(std::max(_width, _height));
