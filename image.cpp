@@ -62,73 +62,7 @@ int Image<T>::GetHeight() const
 }
 
 template <typename T>
-Image<T> Image<T>::GetConvolved(const std::vector<T> &kernel) const
-{
-    Image result(_width, _height);
-
-    int size = kernel.size();
-    int halfSize = size / 2;
-    for (size_t y = 0; y < _height; y++)
-    {
-        for (size_t x = 0; x < _width; x++)
-        {
-            T sum = 0;
-            for (size_t kernelY = 0; kernelY < size; kernelY++)
-            {
-                for (size_t kernelX = 0; kernelX < size; kernelX++)
-                {
-                    int offsetX = x + kernelX - halfSize;
-                    int offsetY = y + kernelY - halfSize;
-                    sum += kernel[kernelY * size + kernelX] * GetPixel(offsetX, offsetY, CLAMP);
-                }
-            }
-            result.SetPixel(x, y, sum);
-        }
-    }
-
-    return result;
-}
-
-template <typename T>
-Image<T> Image<T>::GetConvolvedSeparable(const std::vector<T> &kernelX, const std::vector<T> &kernelY) const
-{
-    Image intermediate1(_width, _height);
-    Image intermediate2(_width, _height);
-
-    int size = kernelX.size();
-    int halfSize = size / 2;
-    for (size_t y = 0; y < _height; y++)
-    {
-        for (size_t x = 0; x < _width; x++)
-        {
-            T sum = 0;
-            for (size_t kernelOffset = 0; kernelOffset < size; kernelOffset++)
-            {
-                int offsetX = x + kernelOffset - halfSize;
-                sum += kernelX[kernelOffset] * GetPixel(offsetX, y, CLAMP);
-            }
-            intermediate1.SetPixel(x, y, sum);
-        }
-    }
-
-    for (size_t y = 0; y < _height; y++)
-    {
-        for (size_t x = 0; x < _width; x++)
-        {
-            T sum = 0;
-            for (size_t kernelOffset = 0; kernelOffset < size; kernelOffset++)
-            {
-                int offsetY = y + kernelOffset - halfSize;
-                sum += kernelY[kernelOffset] * intermediate1.GetPixel(x, offsetY, CLAMP);
-            }
-            intermediate2.SetPixel(x, y, sum);
-        }
-    }
-    return intermediate2;
-}
-
-template <typename T>
-void Image<T>::ConvolveOptimized(const std::vector<T> &kernelX, const std::vector<T> &kernelY)
+void Image<T>::Convolve(const std::vector<T> &kernelX, const std::vector<T> &kernelY)
 {
     std::vector<T> buffer(std::max(_width, _height));
 
@@ -197,55 +131,6 @@ void Image<T>::ConvolveOptimized(const std::vector<T> &kernelX, const std::vecto
             }
             buffer[y] = sumTop;
             buffer[y + _height - halfSize] = sumBottom;
-        }
-
-        for (size_t i = 0; i < _height; i++)
-        {
-            _data[i * _width + x] = buffer[i];
-        }
-    }
-}
-
-template <typename T>
-void Image<T>::Convolve(const std::vector<T> &kernelX, const std::vector<T> &kernelY)
-{
-    std::vector<T> buffer(std::max(_width, _height));
-
-    int size = kernelX.size();
-    int halfSize = size / 2;
-
-    for (size_t y = 0; y < _height; y++)
-    {
-        for (size_t x = 0; x < _width; x++)
-        {
-            T sum = 0;
-            for (int kernelOffset = -halfSize; kernelOffset <= halfSize; kernelOffset++)
-            {
-                int offsetX = x + kernelOffset;
-                offsetX = std::max(0, std::min(offsetX, _width - 1));
-                sum += kernelX[kernelOffset + halfSize] * _data[y * _width + offsetX];
-            }
-            buffer[x] = sum;
-        }
-
-        for (size_t i = 0; i < _width; i++)
-        {
-            _data[y * _width + i] = buffer[i];
-        }
-    }
-
-    for (size_t x = 0; x < _width; x++)
-    {
-        for (size_t y = 0; y < _height; y++)
-        {
-            T sum = 0;
-            for (int kernelOffset = -halfSize; kernelOffset <= halfSize; kernelOffset++)
-            {
-                int offsetY = y + kernelOffset;
-                offsetY = std::max(0, std::min(offsetY, _height - 1));
-                sum += kernelY[kernelOffset + halfSize] * _data[offsetY * _width + x];
-            }
-            buffer[y] = sum;
         }
 
         for (size_t i = 0; i < _height; i++)
