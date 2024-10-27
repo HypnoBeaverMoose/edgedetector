@@ -13,12 +13,14 @@ Image<float> FileUtils::LoadImage(std::string filename)
         exit(1);
     }
 
+
     unsigned char header[18] = {0};
     // Read header
     file.read((char *)header, sizeof(header));
     if (!file)
     {
         std::cerr << "Error reading header" << std::endl;
+        file.close();
         exit(1);
     }
 
@@ -31,6 +33,7 @@ Image<float> FileUtils::LoadImage(std::string filename)
     if (!file)
     {
         std::cerr << "Error reading data" << std::endl;
+        file.close();
         exit(1);
     }
 

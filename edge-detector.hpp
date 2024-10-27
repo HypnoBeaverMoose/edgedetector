@@ -2,16 +2,22 @@
 #include <string>
 #include "image.hpp"
 
+
+/// @brief Performs Canny edge detection.
 template <typename T>
 class EdgeDetector
 {
 public:
     EdgeDetector(bool debug = false, std::string debugPath = "images/debug-images/") : _debugPath(debugPath), _debug(debug) {};
 
-    void FindEdges(Image<T> &input, T threshold, T edgeStrength, float blurStrength) const;
+    /// @brief Finds edges of features defined in image and writes them in that same image.
+    /// @param image input image.
+    /// @param threshold threshold below, which edges are discarded.
+    /// @param edgeStrength maximum edge strength.
+    void FindEdges(Image<T> &input, T threshold, T edgeStrength) const;
 
 private:
-    void ApplyBlur(Image<T> &input, float blurStrength) const;
+    void ApplyBlur(Image<T> &input) const;
 
     void ApplyFilter(Image<T> &filterX, Image<T> &filterY) const;
 

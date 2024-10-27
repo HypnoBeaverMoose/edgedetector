@@ -4,58 +4,39 @@
 #include "file-utils.hpp"
 #include <algorithm>
 #include <iostream>
+#include "auxiliary.hpp"
 
-int offsets[8] = {0, 1, 1, 1, 1, 0, 1, -1};
-int connectivity[16] = {-1, -1, 0, -1, 1, -1, -1, 0, 1, 0, -1, 1, 0, 1, 1, 1};
+const float blurStrength = 2;
 
-Kernel<float, 3>
-    SobelX((float[3]){1, 0, -1}, (float[3]){1, 2, 1});
+Gaussian<5> gaussian(blurStrength);
+
+Kernel<float, 3> SobelX((float[3]){1, 0, -1}, (float[3]){1, 2, 1});
+
 Kernel<float, 3> SobelY((float[3]){1, 2, 1}, (float[3]){1, 0, -1});
 
-template <typename TRet, typename TLeft, typename TRight>
-TRet FindGradientDirection(TLeft left, TRight right)
-{
-    TLeft deg = (std::atan2(left, right) * 57.2958);
-    deg = deg / 45;
-
-    int index = std::round(deg);
-    if (index < 0)
-    {
-        index += 4;
-    }
-    else if (index == 4)
-    {
-        index = 0;
-    }
-    return index;
-}
-
-template <typename TRet, typename TLeft, typename TRight>
-TRet CombineGradients(TLeft left, TRight right)
-{
-    return std::sqrt(left * left + right * right);
-}
-
-template <typename TRet, typename TLeft, typename TRight>
-TRet Difference(TLeft left, TRight right)
-{
-    return std::abs(left - right);
-}
-
 template <typename T>
-void EdgeDetector<T>::FindEdges(Image<T> &image, T threshold, T edgeStrength, float blurStrength) const
+void EdgeDetector<T>::FindEdges(Image<T> &image, T threshold, T edgeStrength) const
 {
-    ApplyBlur(image, blurStrength);
+
+    // Blur the input image to remove noise.
+    ApplyBlur(image);
+
     if (_debug)
     {
         FileUtils::SaveImage(image, _debugPath + "blurred.tga");
     }
 
+    // Try to reuse images to reduce memory allocation.
     Image<T> &filterX = image;
     Image<T> &initialEdges = image;
     Image<T> filterY(image);
 
+    // Apply a filter in two directions to find the image gradients.
+    // filterX is reused here.
     ApplyFilter(filterX, filterY);
+
+    // Use the filtered images to find local maxima in the gradient.
+    // Those correspond to best place for an edge.
     FindInitialEdges(filterX, filterY, initialEdges);
 
     if (_debug)
@@ -63,6 +44,8 @@ void EdgeDetector<T>::FindEdges(Image<T> &image, T threshold, T edgeStrength, fl
         FileUtils::SaveImage(initialEdges, _debugPath + "initial-edges.tga");
     }
 
+    // Apply a LOW and a HIGH threshold - everything below LOW is set to zero.
+    // Everything above HIGH is edgeStrength
     initialEdges.ApplyDoubleThreshold(threshold / 4, threshold, edgeStrength);
 
     if (_debug)
@@ -70,6 +53,7 @@ void EdgeDetector<T>::FindEdges(Image<T> &image, T threshold, T edgeStrength, fl
         FileUtils::SaveImage(initialEdges, _debugPath + "threshold.tga");
     }
 
+    // Hysteresis edge tracking - look for adjacent "strong" edges.
     TrackEdges(initialEdges, image, edgeStrength);
 
     if (_debug)
@@ -79,20 +63,9 @@ void EdgeDetector<T>::FindEdges(Image<T> &image, T threshold, T edgeStrength, fl
 }
 
 template <typename T>
-void EdgeDetector<T>::FindInitialEdges(const Image<T> &filterX, const Image<T> &filterY, Image<T> &result) const
+void EdgeDetector<T>::ApplyBlur(Image<T> &input) const
 {
-    Image<T> gradient(filterX.GetWidth(), filterY.GetHeight());
-    Image<unsigned char> direction(filterX.GetWidth(), filterY.GetHeight());
-
-    CombineImages<T, T, T>(filterX, filterY, gradient, CombineGradients<T, T, T>);
-    CombineImages<unsigned char, T, T>(filterX, filterY, direction, FindGradientDirection<unsigned char, T, T>);
-
-    if (_debug)
-    {
-        FileUtils::SaveImage(gradient, _debugPath + "gradient.tga");
-    }
-
-    FindLocalMaxima(gradient, direction, result);
+    return input.Convolve(gaussian.GetHorizontal(), gaussian.GetGetVertical());
 }
 
 template <typename T>
@@ -103,10 +76,24 @@ void EdgeDetector<T>::ApplyFilter(Image<T> &filterX, Image<T> &filterY) const
 }
 
 template <typename T>
-void EdgeDetector<T>::ApplyBlur(Image<T> &input, float blurStrength) const
+void EdgeDetector<T>::FindInitialEdges(const Image<T> &filterX, const Image<T> &filterY, Image<T> &result) const
 {
-    Gaussian<5> gaussian(blurStrength);
-    return input.Convolve(gaussian.GetHorizontal(), gaussian.GetGetVertical());
+    Image<T> gradient(filterX.GetWidth(), filterY.GetHeight());
+
+    Image<unsigned char> direction(filterX.GetWidth(), filterY.GetHeight());
+
+    // Add gradients in two directions to find gradient intensity.
+    CombineImages<T, T, T>(filterX, filterY, gradient, Aux::CombineGradients<T, T, T>);
+
+    // For each pixel, determine the direction of the gradient, and quantify that into 8 buckets.
+    CombineImages<unsigned char, T, T>(filterX, filterY, direction, Aux::FindGradientDirection<unsigned char, T, T>);
+
+    if (_debug)
+    {
+        FileUtils::SaveImage(gradient, _debugPath + "gradient.tga");
+    }
+
+    FindLocalMaxima(gradient, direction, result);
 }
 
 template <typename T>
@@ -118,6 +105,10 @@ void EdgeDetector<T>::FindLocalMaxima(const Image<T> &gradient, const Image<unsi
         exit(1);
     }
 
+    // Should be understood in pairs.
+    // Relative directions of adjacent pixels.
+    static const int directions[8] = {0, 1, 1, 1, 1, 0, 1, -1};
+
     int width = gradient.GetWidth();
     int height = gradient.GetHeight();
 
@@ -125,25 +116,29 @@ void EdgeDetector<T>::FindLocalMaxima(const Image<T> &gradient, const Image<unsi
     {
         for (size_t x = 0; x < width; x++)
         {
+            // The direction index of the gradient is used both in the positive and negative directions.
             unsigned char directionIndex = direction.GetPixelUnsafe(x, y);
-            int positiveX = x + offsets[directionIndex * 2];
-            int positiveY = y + offsets[directionIndex * 2 + 1];
+            int positiveX = x + directions[directionIndex * 2];
+            int positiveY = y + directions[directionIndex * 2 + 1];
 
-            int negativeX = x - offsets[directionIndex * 2];
-            int negativeY = y - offsets[directionIndex * 2 + 1];
+            int negativeX = x - directions[directionIndex * 2];
+            int negativeY = y - directions[directionIndex * 2 + 1];
 
+            // Find pixels in both gradient directions - in the directions of increase and decrease.
             T before = gradient.GetPixel(positiveX, positiveY);
             T after = gradient.GetPixel(negativeX, negativeY);
-
             T current = gradient.GetPixelUnsafe(x, y);
 
+            // If neighbouring pixels have less intensity we have found a local maximum.
+            // We want to keep the local maxima, and set all other pixels to zero.
+            // >= ensures we keep one of maximum pixels with the same intensity.
             if (current >= before && current > after)
             {
-                result.SetPixelUnsafe(x, y, current);
+                result.SetPixel(x, y, current);
             }
             else
             {
-                result.SetPixelUnsafe(x, y, 0);
+                result.SetPixel(x, y, 0);
             }
         }
     }
@@ -159,7 +154,7 @@ void EdgeDetector<T>::TrackEdges(const Image<T> &input, Image<T> &result, T edge
     {
         for (int x = 0; x < width; x++)
         {
-            result.SetPixelUnsafe(x, y, DetermineEdgeValue(input, x, y, edgeValue));
+            result.SetPixel(x, y, DetermineEdgeValue(input, x, y, edgeValue));
         }
     }
 }
@@ -173,8 +168,11 @@ T EdgeDetector<T>::DetermineEdgeValue(const Image<T> &input, int x, int y, T edg
         return val;
     }
 
+    static const int connectivity[16] = {-1, -1, 0, -1, 1, -1, -1, 0, 1, 0, -1, 1, 0, 1, 1, 1};
+
     for (size_t i = 0; i < 8; i++)
     {
+        //If there are any neighbouring pixels with high intensity, this pixel is part of a strong edge and should be kept.
         int realX = x + connectivity[i * 2];
         int realY = y + connectivity[i * 2 + 1];
         T pixel = input.GetPixel(realX, realY, Image<T>::CLAMP);

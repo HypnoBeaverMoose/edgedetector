@@ -2,6 +2,9 @@
 #include <vector>
 #include <algorithm>
 
+/// @brief Represents a separable kernel
+/// @tparam T element type
+/// @tparam N size
 template <typename T, unsigned int N>
 class Kernel
 {
@@ -19,6 +22,7 @@ protected:
     std::vector<T> _vertical;
 };
 
+/// @brief Represents a gaussian kernel
 template <unsigned int N>
 class Gaussian : public Kernel<float, N>
 {
@@ -37,9 +41,10 @@ public:
             this->_horizontal[x + halfsize] = val;
             sum += val;
         }
-        for (size_t i = 0; i < N; i++)
+
+        for (auto &&element : this->_horizontal)
         {
-            this->_horizontal[i] /= sum;
+            element /= sum;
         }
 
         std::copy(this->_horizontal.begin(), this->_horizontal.end(), this->_vertical.begin());

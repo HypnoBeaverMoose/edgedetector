@@ -6,6 +6,7 @@
 template <typename T>
 T Image<T>::GetPixel(int x, int y, OverflowStrategy overflow, T def) const
 {
+    //Overflow strategy.
     switch (overflow)
     {
     case DEFAULT:
@@ -50,20 +51,14 @@ void Image<T>::SetPixel(int x, int y, T value)
 }
 
 template <typename T>
-int Image<T>::GetWidth() const
-{
-    return _width;
-}
-
-template <typename T>
-int Image<T>::GetHeight() const
-{
-    return _height;
-}
-
-template <typename T>
 void Image<T>::Convolve(const std::vector<T> &kernelX, const std::vector<T> &kernelY)
 {
+    // Runs a convolution using a separable kernel.
+    // First step convolves along x axis, second along y.
+    // Each step is divided in two cases - a general "quick" case that doesn't need to handle overflow
+    // and an "edge case" that handles pixels around image boundaries.
+
+    // buffer used to minimize allocation.
     std::vector<T> buffer(std::max(_width, _height));
 
     int size = kernelX.size();
@@ -155,8 +150,7 @@ void Image<T>::ApplyDoubleThreshold(T low, T high, T max)
 {
     for (auto &&pixel : _data)
     {
-        pixel = pixel < low ? 0 : pixel > high ? max
-                                               : pixel;
+        pixel = pixel < low ? T(0) : pixel > high ? max : pixel;
     }
 }
 
@@ -171,6 +165,13 @@ int Image<int>::NormalizeElement(int element, int normalizer)
 {
     return std::round(element / (float)normalizer);
 }
+
+template <>
+unsigned char Image<unsigned char>::NormalizeElement(unsigned char element, unsigned char normalizer)
+{
+    return std::round(element / (float)normalizer);
+}
+
 
 template <typename T>
 std::vector<std::tuple<int, int>> Image<T>::FindNonZeroPixels() const

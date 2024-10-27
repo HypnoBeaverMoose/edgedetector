@@ -1,10 +1,4 @@
 {
-    "cSpell.words": [
-        "clox",
-        "eturn",
-        "hile",
-        "uper"
-    ],
     "cmake.cmakePath": "/usr/local/bin/cmake",
     "files.associations": {
         "value.h": "c",

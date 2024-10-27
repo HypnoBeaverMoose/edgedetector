@@ -5,7 +5,6 @@
 #include "file-utils.hpp"
 
 void PrintNonZeroPixels(std::string filename, float threshold);
-void ConvolveTest(std::string filename);
 
 int main(int argc, char **argv)
 {
@@ -32,9 +31,9 @@ void PrintNonZeroPixels(std::string filename, float threshold)
 {
     Image<float> image = TgaImageFactory(filename).GetImage();
 
-    EdgeDetector<float> edgeDetector(false);
+    EdgeDetector<float> edgeDetector(true);
 
-    edgeDetector.FindEdges(image, threshold, 1.0f, 2);
+    edgeDetector.FindEdges(image, threshold, 1.0f);
 
     auto edgePixels = image.FindNonZeroPixels();
     for (auto &pixel : edgePixels)
