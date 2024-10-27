@@ -23,21 +23,21 @@ protected:
 };
 
 /// @brief Represents a gaussian kernel
-template <unsigned int N>
-class Gaussian : public Kernel<float, N>
+template <typename T, unsigned int N>
+class Gaussian : public Kernel<T, N>
 {
 public:
-    Gaussian(float sigma) : Kernel<float, N>((float[N]){}, (float[N]){})
+    Gaussian(T sigma) : Kernel<T, N>((T[N]){}, (T[N]){})
     {
-        float sigmaSqr = sigma * sigma;
-        float div = 1.0f / std::sqrt(2 * M_PI * sigmaSqr);
+        T sigmaSqr = sigma * sigma;
+        T div = T(1) / std::sqrt(2 * M_PI * sigmaSqr);
         int size = N;
         int halfsize = size / 2;
 
-        float sum = 0;
+        T sum = 0;
         for (int x = -halfsize; x <= halfsize; x++)
         {
-            float val = std::exp(-0.5f * x * x / sigmaSqr) * div;
+            T val = std::exp(-0.5f * x * x / sigmaSqr) * div;
             this->_horizontal[x + halfsize] = val;
             sum += val;
         }

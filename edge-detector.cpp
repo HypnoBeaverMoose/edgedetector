@@ -6,9 +6,9 @@
 #include <iostream>
 #include "auxiliary.hpp"
 
-const float blurStrength = 2;
+const float blurStrength = 1;
 
-Gaussian<5> gaussian(blurStrength);
+Gaussian<float, 5> gaussian(blurStrength);
 
 Kernel<float, 3> SobelX((float[3]){1, 0, -1}, (float[3]){1, 2, 1});
 
