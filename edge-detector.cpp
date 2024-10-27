@@ -17,9 +17,11 @@ Kernel<float, 3> SobelY((float[3]){1, 2, 1}, (float[3]){1, 0, -1});
 template <typename T>
 void EdgeDetector<T>::FindEdges(Image<T> &image, T threshold, T edgeStrength) const
 {
-
-    // Blur the input image to remove noise.
-    ApplyBlur(image);
+    if (_useBlur)
+    {
+        // Blur the input image to remove noise.
+        ApplyBlur(image);
+    }
 
     if (_debug)
     {
@@ -172,7 +174,7 @@ T EdgeDetector<T>::DetermineEdgeValue(const Image<T> &input, int x, int y, T edg
 
     for (size_t i = 0; i < 8; i++)
     {
-        //If there are any neighbouring pixels with high intensity, this pixel is part of a strong edge and should be kept.
+        // If there are any neighbouring pixels with high intensity, this pixel is part of a strong edge and should be kept.
         int realX = x + connectivity[i * 2];
         int realY = y + connectivity[i * 2 + 1];
         T pixel = input.GetPixel(realX, realY, Image<T>::CLAMP);

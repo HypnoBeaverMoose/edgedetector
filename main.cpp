@@ -31,7 +31,7 @@ void PrintNonZeroPixels(std::string filename, float threshold)
 {
     Image<float> image = TgaImageFactory(filename).GetImage();
 
-    EdgeDetector<float> edgeDetector(true);
+    EdgeDetector<float> edgeDetector(false, false);
 
     edgeDetector.FindEdges(image, threshold, 1.0f);
 
