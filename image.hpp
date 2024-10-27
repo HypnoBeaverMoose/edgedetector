@@ -19,7 +19,7 @@ public:
 
     Image(int width, int height, const std::vector<T> &input) : _width(width), _height(height), _data(input) {}
 
-    Image(int width, int height, const std::vector<T> &&input) : _width(width), _height(height), _data(input) {}
+    Image(int width, int height, const std::vector<T> &&input) : _width(width), _height(height), _data(std::move(input)) {}
 
     T GetPixel(int x, int y, OverflowStrategy overflow = DEFAULT, T def = 0) const;
 

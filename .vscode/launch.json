@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(lldb) Launch",
+            "name": "(lldb) Launch Debug",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/bin/${fileWorkspaceFolderBasename}",
@@ -12,7 +12,7 @@
             "environment": [],
             "externalConsole": false,
             "MIMode": "lldb",
-            "preLaunchTask": "${defaultBuildTask}",
+            "preLaunchTask": "Debug",
             "logging": {
                 "moduleLoad": false, 
                 "trace": true,
@@ -20,17 +20,22 @@
             }
         },
         {
-            "name": "C/C++: clang++ build and debug active file",
+            "name": "(lldb) Launch Release",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/bin/${fileWorkspaceFolderBasename}",
-            "args": [],
+            "args": ["images/input.tga", "0.08"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
             "externalConsole": false,
             "MIMode": "lldb",
-            "preLaunchTask": "C/C++: clang build active file"
-        }
+            "preLaunchTask": "Release",
+            "logging": {
+                "moduleLoad": false, 
+                "trace": true,
+                "exceptions": true
+            }
+        },
     ]
 }
