@@ -12,18 +12,18 @@ public:
     virtual Image<T> GetImage() = 0;
 };
 
-class PredefinedImageFactory : ImageFactory<int>
+class PredefinedImageFactory : ImageFactory<float>
 {
 public:
-    virtual Image<int> GetImage()
+    virtual Image<float> GetImage()
     {
-        std::vector<int> v = {
+        std::vector<float> v = {
             1, 1, 3, 5, 7, 9, 9, 9, 9, 9,
             1, 1, 1, 3, 5, 7, 9, 9, 9, 9,
             1, 1, 1, 1, 3, 5, 7, 9, 9, 9,
             1, 1, 1, 1, 1, 3, 5, 7, 9, 9};
 
-        return Image<int>(10, 4, v);
+        return Image<float>(10, 4, v);
     }
 };
 
