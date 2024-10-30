@@ -3,3 +3,7 @@
 bin/
 images/
 .DS_Store
+.vs
+Edgedetector/input.tga
+Edgedetector/Edgedetector/
+Edgedetector/x64
