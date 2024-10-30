@@ -1,6 +1,8 @@
 #pragma once
 #include <vector>
 #include <iostream>
+#include <functional>
+
 
 /// @brief Represents an image.
 template <typename T>

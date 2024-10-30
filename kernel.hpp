@@ -1,6 +1,9 @@
 #pragma once
 #include <vector>
 #include <algorithm>
+#include<math.h>
+
+# define M_PI           3.14159265358979323846  /* pi */
 
 /// @brief Represents a separable kernel
 /// @tparam T element type
@@ -10,6 +13,8 @@ class Kernel
 {
 public:
     Kernel(const T horizontal[N], const T vertical[N]) : _horizontal(horizontal, horizontal + N), _vertical(vertical, vertical + N) {}
+
+    Kernel() : _horizontal(N), _vertical(N) {}
 
     const std::vector<T> &GetHorizontal() { return _horizontal; }
 
@@ -27,7 +32,7 @@ template <typename T, unsigned int N>
 class Gaussian : public Kernel<T, N>
 {
 public:
-    Gaussian(T sigma) : Kernel<T, N>((T[N]){}, (T[N]){})
+    Gaussian(T sigma) : Kernel<T, N>()
     {
         T sigmaSqr = sigma * sigma;
         T div = T(1) / std::sqrt(2 * M_PI * sigmaSqr);

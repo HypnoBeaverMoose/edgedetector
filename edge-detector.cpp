@@ -10,9 +10,12 @@ const float blurStrength = 1;
 
 Gaussian<float, 5> gaussian(blurStrength);
 
-Kernel<float, 3> SobelX((float[3]){1, 0, -1}, (float[3]){1, 2, 1});
+float first[3] = { 1, 0, -1 };
+float second[3] = { 1, 2, 1 };
 
-Kernel<float, 3> SobelY((float[3]){1, 2, 1}, (float[3]){1, 0, -1});
+Kernel<float, 3> SobelX(first, second);
+
+Kernel<float, 3> SobelY(second, first);
 
 template <typename T>
 void EdgeDetector<T>::FindEdges(Image<T> &image, T threshold, T edgeStrength) const

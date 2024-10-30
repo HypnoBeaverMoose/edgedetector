@@ -38,14 +38,16 @@ Image<float> FileUtils::LoadImage(std::string filename)
     }
 
     std::vector<float> result;
-    int pixelCount = data.size() / 3;
+    int pixelCount = data.size() / channels;
+
     for (size_t i = 0; i < pixelCount; i++)
     {
-        int channel = i * 3;
-        float intensity = ((float)data[channel] +
-                           (float)data[channel + 1] + (float)data[channel + 2]) /
-                          (channels * 255.0f);
-
+        float intensity = 0;
+        for (size_t c = 0; c < channels; c++)
+        {
+            intensity += data[i * channels + c];                
+        }
+        intensity /= (channels * 255.0f);
         result.push_back(intensity);
     }
 
