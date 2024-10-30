@@ -8,10 +8,10 @@ namespace Aux
     template <typename TRet, typename TLeft, typename TRight>
     TRet FindGradientDirection(TLeft left, TRight right)
     {
-        TLeft deg = (std::atan2(left, right) * 57.2958);
+        TLeft deg = (std::atan2(left, right) * (TLeft)57.2958);
         deg = deg / 45;
 
-        int index = std::round(deg);
+        int index = (int)std::round(deg);
         if (index < 0)
         {
             index += 4;

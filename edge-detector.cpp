@@ -117,9 +117,9 @@ void EdgeDetector<T>::FindLocalMaxima(const Image<T> &gradient, const Image<unsi
     int width = gradient.GetWidth();
     int height = gradient.GetHeight();
 
-    for (size_t y = 0; y < height; y++)
+    for (int y = 0; y < height; y++)
     {
-        for (size_t x = 0; x < width; x++)
+        for (int x = 0; x < width; x++)
         {
             // The direction index of the gradient is used both in the positive and negative directions.
             unsigned char directionIndex = direction.GetPixelUnsafe(x, y);

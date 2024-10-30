@@ -1,9 +1,9 @@
 #pragma once
 #include <vector>
 #include <algorithm>
-#include<math.h>
 
-# define M_PI           3.14159265358979323846  /* pi */
+#define _USE_MATH_DEFINES
+#include<math.h>
 
 /// @brief Represents a separable kernel
 /// @tparam T element type
@@ -35,7 +35,7 @@ public:
     Gaussian(T sigma) : Kernel<T, N>()
     {
         T sigmaSqr = sigma * sigma;
-        T div = T(1) / std::sqrt(2 * M_PI * sigmaSqr);
+        T div = T(1) / std::sqrt(2 * (T)M_PI * sigmaSqr);
         int size = N;
         int halfsize = size / 2;
 

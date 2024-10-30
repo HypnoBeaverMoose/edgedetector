@@ -8,7 +8,7 @@ template <typename T>
 class EdgeDetector
 {
 public:
-    EdgeDetector(bool useBlur, bool debug = false, std::string debugPath = "images/debug-images/") : _debugPath(debugPath), _debug(debug) {};
+    EdgeDetector(bool useBlur, bool debug = false, std::string debugPath = "images/debug-images/") : _debugPath(debugPath), _debug(debug), _useBlur(useBlur) {};
 
     /// @brief Finds edges of features defined in image and writes them in that same image.
     /// @param image input image.

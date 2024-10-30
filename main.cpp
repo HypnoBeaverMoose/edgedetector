@@ -19,7 +19,7 @@ int main(int argc, char **argv)
     else
     {
         filename = argv[1];
-        threshold = std::atof(argv[2]);
+        threshold = (float)std::atof(argv[2]);
     }
 
     PrintNonZeroPixels(filename, threshold);
