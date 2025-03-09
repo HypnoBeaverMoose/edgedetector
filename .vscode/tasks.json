@@ -1,52 +1,31 @@
 {
     "tasks": [
         {
-            "type": "cppbuild",
-            "label": "Debug",
-            "command": "/usr/bin/g++",
-            "args": [
-                "-std=c++11",
-                "-fcolor-diagnostics",
-                "-fansi-escape-codes",
-                "-g",
-                "${workspaceFolder}/*.cpp",
-                "-o",
-                "${workspaceFolder}/bin/${fileWorkspaceFolderBasename}"
-            ],
-            "options": {
-                "cwd": "${fileDirname}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
+            "type": "cmake",
+            "label": "CMake: configure",
+            "command": "configure",
+            "problemMatcher": [],
+            "detail": "CMake template configure task"
         },
         {
-            "type": "cppbuild",
-            "label": "Release",
-            "command": "/usr/bin/g++",
-            "args": [
-                "-std=c++11",
-                "-O2",
-                "-fcolor-diagnostics",
-                "-fansi-escape-codes",
-                "${workspaceFolder}/*.cpp",
-                "-o",
-                "${workspaceFolder}/bin/${fileWorkspaceFolderBasename}"
+            "type": "cmake",
+            "label": "CMake: build",
+            "command": "build",
+            "targets": [
+                "all"
             ],
-            "options": {
-                "cwd": "${fileDirname}"
-            },
+            "group": "build",
             "problemMatcher": [
                 "$gcc"
             ],
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            },
+            "detail": "CMake template build task"
+        },
+        {
+            "type": "cmake",
+            "label": "CMake: clean",
+            "command": "clean",
+            "problemMatcher": [],
+            "detail": "CMake template clean task"
         }
     ],
     "version": "2.0.0"

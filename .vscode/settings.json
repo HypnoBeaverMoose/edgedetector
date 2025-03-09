@@ -1,5 +1,5 @@
 {
-    "cmake.cmakePath": "/usr/local/bin/cmake",
+    "cmake.cmakePath": "/opt/homebrew/bin/cmake",
     "files.associations": {
         "value.h": "c",
         "stdint.h": "c",
