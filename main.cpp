@@ -4,40 +4,37 @@
 #include "image-factory.hpp"
 #include "file-utils.hpp"
 
-void PrintNonZeroPixels(std::string filename, float threshold);
+void FindEdges(std::string input, std::string output, float threshold);
 
 int main(int argc, char **argv)
 {
-    std::string filename;
+    std::string input, output;
     float threshold;
 
-    if (argc != 3)
+    if (argc != 4)
     {
-        std::cout << "Usage: edgedetector <filename> <threshold[0-1]>" << std::endl;
+        std::cout << "Usage: edgedetector <input> <output> <threshold[0-1]>" << std::endl;
         exit(1);
     }
     else
     {
-        filename = argv[1];
-        threshold = (float)std::atof(argv[2]);
+        input = argv[1];
+        output = argv[2];
+        threshold = std::atof(argv[3]);
     }
 
-    PrintNonZeroPixels(filename, threshold);
+    FindEdges(input, output, threshold);
 
     return 0;
 }
 
-void PrintNonZeroPixels(std::string filename, float threshold)
+void FindEdges(std::string inputFilename, std::string outputFilename, float threshold)
 {
-    Image<float> image = TgaImageFactory(filename).GetImage();
+    Image<float> image = TgaImageFactory(inputFilename).GetImage();
 
     EdgeDetector<float> edgeDetector(false, true, "");
 
     edgeDetector.FindEdges(image, threshold, 1.0f);
 
-    auto edgePixels = image.FindNonZeroPixels();
-    for (auto &pixel : edgePixels)
-    {
-        std::cout << std::get<0>(pixel) << " " << std::get<1>(pixel) << std::endl;
-    }
+    FileUtils::SaveImage(image, outputFilename);
 }

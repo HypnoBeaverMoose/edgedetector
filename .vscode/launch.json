@@ -10,6 +10,7 @@
             "program": "${command:cmake.launchTargetPath}",
             "args": [
                 "images/input.tga",
+                "images/output.tga",
                 "0.08"
             ],
             "stopAtEntry": false,
@@ -34,6 +35,7 @@
             "program": "${command:cmake.launchTargetPath}",
             "args": [
                 "images/input.tga",
+                "images/output.tga",
                 "0.08"
             ],
             "stopAtEntry": false,
