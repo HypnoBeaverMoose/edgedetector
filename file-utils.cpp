@@ -13,7 +13,6 @@ Image<float> FileUtils::LoadImage(std::string filename)
         exit(1);
     }
 
-
     unsigned char header[18] = {0};
     // Read header
     file.read((char *)header, sizeof(header));
@@ -45,7 +44,7 @@ Image<float> FileUtils::LoadImage(std::string filename)
         float intensity = 0;
         for (size_t c = 0; c < channels; c++)
         {
-            intensity += data[i * channels + c];                
+            intensity += data[i * channels + c];
         }
         intensity /= (channels * 255.0f);
         result.push_back(intensity);

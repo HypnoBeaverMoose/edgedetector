@@ -10,12 +10,9 @@ const float blurStrength = 1;
 
 Gaussian<float, 5> gaussian(blurStrength);
 
-float first[3] = { 1, 0, -1 };
-float second[3] = { 1, 2, 1 };
-
-Kernel<float, 3> SobelX(first, second);
-
-Kernel<float, 3> SobelY(second, first);
+float sobelXData1[3] = {1, 0, -1};
+float sobelXData2[3] = {1, 2, 1};
+Kernel<float, 3> SobelX(sobelXData1, sobelXData2);
 
 template <typename T>
 void EdgeDetector<T>::FindEdges(Image<T> &image, T threshold, T edgeStrength) const
@@ -114,8 +111,8 @@ void EdgeDetector<T>::FindLocalMaxima(const Image<T> &gradient, const Image<unsi
     // Relative directions of adjacent pixels.
     static const int directions[8] = {0, 1, 1, 1, 1, 0, 1, -1};
 
-    int width = gradient.GetWidth();
-    int height = gradient.GetHeight();
+    size_t width = (size_t)gradient.GetWidth();
+    size_t height = (size_t)gradient.GetHeight();
 
     for (int y = 0; y < height; y++)
     {

@@ -2,13 +2,13 @@
 #include <string>
 #include "image.hpp"
 
-
 /// @brief Performs Canny edge detection.
 template <typename T>
 class EdgeDetector
 {
 public:
-    EdgeDetector(bool useBlur, bool debug = false, std::string debugPath = "images/debug-images/") : _debugPath(debugPath), _debug(debug), _useBlur(useBlur) {};
+    EdgeDetector(bool useBlur, bool debug = false, std::string debugPath = "images/debug-images/")
+        : _useBlur(useBlur), _debugPath(debugPath), _debug(debug) {};
 
     /// @brief Finds edges of features defined in image and writes them in that same image.
     /// @param image input image.

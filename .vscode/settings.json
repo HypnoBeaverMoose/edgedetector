@@ -63,5 +63,9 @@
         "iomanip": "cpp",
         "memory_resource": "cpp",
         "type_traits": "cpp"
-    }
+    },
+    "cSpell.words": [
+        "Wextra",
+        "Wpedantic"
+    ]
 }

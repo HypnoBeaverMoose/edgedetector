@@ -3,7 +3,7 @@
 #include <algorithm>
 
 #define _USE_MATH_DEFINES
-#include<math.h>
+#include <math.h>
 
 /// @brief Represents a separable kernel
 /// @tparam T element type
@@ -32,7 +32,7 @@ template <typename T, unsigned int N>
 class Gaussian : public Kernel<T, N>
 {
 public:
-    Gaussian(T sigma) : Kernel<T, N>()
+    Gaussian(T sigma) : Kernel<T, N>(initArray(), initArray())
     {
         T sigmaSqr = sigma * sigma;
         T div = T(1) / std::sqrt(2 * (T)M_PI * sigmaSqr);
@@ -53,5 +53,13 @@ public:
         }
 
         std::copy(this->_horizontal.begin(), this->_horizontal.end(), this->_vertical.begin());
+    }
+
+private:
+    static T *initArray()
+    {
+        static T arr[N];
+        std::fill(arr, arr + N, T(0));
+        return arr;
     }
 };

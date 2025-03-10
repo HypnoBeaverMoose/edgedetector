@@ -6,35 +6,35 @@
 template <typename T>
 T Image<T>::GetPixel(int x, int y, OverflowStrategy overflow, T def) const
 {
-    //Overflow strategy.
+    // Overflow strategy.
     switch (overflow)
     {
     case DEFAULT:
-        if (x < 0 || x >= _width || y < 0 || y >= _height)
+        if (x < 0 || x >= (int)_width || y < 0 || y >= (int)_height)
         {
             return def;
         }
         break;
     case CLAMP:
-        x = std::max(0, std::min(x, _width - 1));
-        y = std::max(0, std::min(y, _height - 1));
+        x = std::max(0, std::min(x, (int)_width - 1));
+        y = std::max(0, std::min(y, (int)_height - 1));
         break;
     case MIRROR:
         if (x < 0)
         {
             x *= -1;
         }
-        else if (x > _width - 1)
+        else if (x > (int)_width - 1)
         {
-            x = 2 * _width - 2 - x;
+            x = 2 * (int)_width - 2 - x;
         }
         if (y < 0)
         {
             y *= -1;
         }
-        else if (y > _height - 1)
+        else if (y > (int)_height - 1)
         {
-            y = 2 * _height - 2 - y;
+            y = 2 * (int)_height - 2 - y;
         }
         break;
     default:
@@ -61,8 +61,8 @@ void Image<T>::Convolve(const std::vector<T> &kernelX, const std::vector<T> &ker
     // buffer used to minimize allocation.
     std::vector<T> buffer(std::max(_width, _height));
 
-    int size = kernelX.size();
-    int halfSize = size / 2;
+    size_t size = (size_t)kernelX.size();
+    size_t halfSize = size / 2;
 
     for (size_t y = 0; y < _height; y++)
     {
@@ -70,7 +70,7 @@ void Image<T>::Convolve(const std::vector<T> &kernelX, const std::vector<T> &ker
         for (size_t x = halfSize; x < _width - halfSize; x++)
         {
             T sum = 0;
-            for (int kernelOffset = -halfSize; kernelOffset <= halfSize; kernelOffset++)
+            for (int kernelOffset = -halfSize; kernelOffset <= (int)halfSize; kernelOffset++)
             {
                 int offsetX = x + kernelOffset;
                 sum += kernelX[kernelOffset + halfSize] * _data[y * _width + offsetX];
@@ -82,7 +82,7 @@ void Image<T>::Convolve(const std::vector<T> &kernelX, const std::vector<T> &ker
         for (size_t x = 0; x < halfSize; x++)
         {
             T sumLeft = 0, sumRight = 0;
-            for (int kernelOffset = -halfSize; kernelOffset <= halfSize; kernelOffset++)
+            for (int kernelOffset = -halfSize; kernelOffset <= (int)halfSize; kernelOffset++)
             {
                 int offsetLeftX = x + kernelOffset;
                 int offsetRightX = offsetLeftX + _width - halfSize;
@@ -105,7 +105,7 @@ void Image<T>::Convolve(const std::vector<T> &kernelX, const std::vector<T> &ker
         for (size_t y = halfSize; y < _height - halfSize; y++)
         {
             T sum = 0;
-            for (int kernelOffset = -halfSize; kernelOffset <= halfSize; kernelOffset++)
+            for (int kernelOffset = -halfSize; kernelOffset <= (int)halfSize; kernelOffset++)
             {
                 int offsetY = y + kernelOffset;
                 sum += kernelY[kernelOffset + halfSize] * _data[offsetY * _width + x];
@@ -117,7 +117,7 @@ void Image<T>::Convolve(const std::vector<T> &kernelX, const std::vector<T> &ker
         for (size_t y = 0; y < halfSize; y++)
         {
             T sumTop = 0, sumBottom = 0;
-            for (int kernelOffset = -halfSize; kernelOffset <= halfSize; kernelOffset++)
+            for (int kernelOffset = -halfSize; kernelOffset <= (int)halfSize; kernelOffset++)
             {
                 int offsetYTop = y + kernelOffset;
                 int offsetYBottom = offsetYTop + _height - halfSize;
@@ -150,7 +150,8 @@ void Image<T>::ApplyDoubleThreshold(T low, T high, T max)
 {
     for (auto &&pixel : _data)
     {
-        pixel = pixel < low ? T(0) : pixel > high ? max : pixel;
+        pixel = pixel < low ? T(0) : pixel > high ? max
+                                                  : pixel;
     }
 }
 
@@ -171,7 +172,6 @@ unsigned char Image<unsigned char>::NormalizeElement(unsigned char element, unsi
 {
     return std::round(element / (float)normalizer);
 }
-
 
 template <typename T>
 std::vector<std::tuple<int, int>> Image<T>::FindNonZeroPixels() const

@@ -19,11 +19,11 @@ public:
 
     Image() : _width(0), _height(0) {}
 
-    Image(int width, int height) : _width(width), _height(height), _data(width * height) {};
+    Image(int width, int height) : _data(width * height), _width(width), _height(height) {};
 
-    Image(int width, int height, const std::vector<T> &input) : _width(width), _height(height), _data(input) {}
+    Image(int width, int height, const std::vector<T> &input) : _data(input), _width(width), _height(height) {}
 
-    Image(int width, int height, const std::vector<T> &&input) : _width(width), _height(height), _data(std::move(input)) {}
+    Image(int width, int height, const std::vector<T> &&input) : _data(std::move(input)), _width(width), _height(height) {}
 
     /// @brief Returns a pixel.
     /// @param x x coord.
@@ -38,9 +38,9 @@ public:
     /// @brief Set's a pixel's value.
     void SetPixel(int x, int y, T value);
 
-    int GetWidth() const { return _width; }
+    size_t GetWidth() const { return _width; }
 
-    int GetHeight() const { return _height; }
+    size_t GetHeight() const { return _height; }
 
     /// @brief Executes a convolution on the image using a separable kernel.
     void Convolve(const std::vector<T> &kernelX, const std::vector<T> &kernelY);
@@ -62,8 +62,8 @@ private:
     T NormalizeElement(T element, T normalizer);
 
     std::vector<T> _data;
-    int _width;
-    int _height;
+    size_t _width;
+    size_t _height;
 };
 
 /// @brief Combines two images, by executing a function for each pixel and records the result in a third image.
@@ -76,8 +76,6 @@ void CombineImages(const Image<TLeft> &left, const Image<TRight> &right, Image<T
         exit(1);
     }
 
-    int height = left._height, width = left._width;
-
     for (size_t i = 0; i < left._data.size(); i++)
     {
         result._data[i] = func(left._data[i], right._data[i]);
@@ -87,8 +85,8 @@ void CombineImages(const Image<TLeft> &left, const Image<TRight> &right, Image<T
 template <typename T>
 std::ostream &operator<<(std::ostream &strm, const Image<T> &a)
 {
-    int height = a.GetHeight();
-    int width = a.GetWidth();
+    size_t height = (size_t)a.GetHeight();
+    size_t width = (size_t)a.GetWidth();
 
     for (size_t y = 0; y < height; y++)
     {
