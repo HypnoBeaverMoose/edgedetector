@@ -1,32 +1,108 @@
 {
+    "version": "2.0.0",
     "tasks": [
         {
-            "type": "cmake",
-            "label": "CMake: configure",
-            "command": "configure",
-            "problemMatcher": [],
-            "detail": "CMake template configure task"
-        },
-        {
-            "type": "cmake",
-            "label": "CMake: build",
-            "command": "build",
-            "targets": [
-                "all"
+            "type": "shell",
+            "label": "CMake: configure (Debug)",
+            "command": "cmake",
+            "args": [
+                "-DCMAKE_BUILD_TYPE=Debug",
+                "-S",
+                ".",
+                "-B",
+                "build/debug"
             ],
-            "group": "build",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
             "problemMatcher": [
                 "$gcc"
             ],
-            "detail": "CMake template build task"
+            "detail": "Configure the project for Debug build"
         },
         {
-            "type": "cmake",
-            "label": "CMake: clean",
-            "command": "clean",
+            "type": "shell",
+            "label": "CMake: configure (Release)",
+            "command": "cmake",
+            "args": [
+                "-DCMAKE_BUILD_TYPE=Release",
+                "-S",
+                ".",
+                "-B",
+                "build/release"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "detail": "Configure the project for Release build",
+            "dependsOn": "CMake: configure (Relase)"
+        },
+        {
+            "type": "shell",
+            "label": "CMake: build (Debug)",
+            "command": "cmake",
+            "args": [
+                "--build",
+                "build/debug"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "detail": "Build the project in Debug mode",
+            "dependsOn": "CMake: configure (Debug)"
+        },
+        {
+            "type": "shell",
+            "label": "CMake: build (Release)",
+            "command": "cmake",
+            "args": [
+                "--build",
+                "build/release"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "detail": "Build the project in Release mode",
+            "dependsOn": "CMake: configure (Release)"
+        },
+        {
+            "type": "shell",
+            "label": "CMake: clean (Debug)",
+            "command": "cmake",
+            "args": [
+                "--build",
+                "build/debug",
+                "--target",
+                "clean"
+            ],
             "problemMatcher": [],
-            "detail": "CMake template clean task"
+            "detail": "Clean the Debug build"
+        },
+        {
+            "type": "shell",
+            "label": "CMake: clean (Release)",
+            "command": "cmake",
+            "args": [
+                "--build",
+                "build/release",
+                "--target",
+                "clean"
+            ],
+            "problemMatcher": [],
+            "detail": "Clean the Release build"
         }
-    ],
-    "version": "2.0.0"
+    ]
 }

@@ -2,9 +2,33 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(lldb) Launch",
+            "name": "(lldb) Launch Debug",
             "type": "cppdbg",
-            "preLaunchTask": "CMake: build",
+            "preLaunchTask": "CMake: build (Debug)",
+            "request": "launch",
+            // Resolved by CMake Tools:
+            "program": "${command:cmake.launchTargetPath}",
+            "args": [
+                "images/input.tga",
+                "0.08"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [
+                {
+                    // add the directory where our target was built to the PATHs
+                    // it gets resolved by CMake Tools:
+                    "name": "PATH",
+                    "value": "${env:PATH}:${command:cmake.getLaunchTargetDirectory}"
+                }
+            ],
+            "externalConsole": true,
+            "MIMode": "lldb"
+        },
+        {
+            "name": "(lldb) Launch Release",
+            "type": "cppdbg",
+            "preLaunchTask": "CMake: build (Release)",
             "request": "launch",
             // Resolved by CMake Tools:
             "program": "${command:cmake.launchTargetPath}",

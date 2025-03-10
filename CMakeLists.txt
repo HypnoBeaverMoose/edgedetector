@@ -30,9 +30,8 @@ set_target_properties(edgedetector PROPERTIES
 
 # Add compile options
 target_compile_options(edgedetector PRIVATE
-    -Wall
-    -Wextra
-    -Wpedantic
+    $<$<CONFIG:Debug>:-Wall -Wextra -Wpedantic -O0 -g>
+    $<$<CONFIG:Release>:-Wall -Wextra -Wpedantic -O3>
 )
 
 # Link libraries (if any)
