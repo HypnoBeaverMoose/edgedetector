@@ -32,7 +32,7 @@ void FindEdges(std::string inputFilename, std::string outputFilename, float thre
 {
     Image<float> image = TgaImageFactory(inputFilename).GetImage();
 
-    EdgeDetector<float> edgeDetector(false, true, "");
+    EdgeDetector<float> edgeDetector(true, false);
 
     edgeDetector.FindEdges(image, threshold, 1.0f);
 

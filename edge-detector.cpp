@@ -17,11 +17,15 @@ Kernel<float, 3> SobelX(sobelXData1, sobelXData2);
 template <typename T>
 void EdgeDetector<T>::FindEdges(Image<T> &image, T threshold, T edgeStrength) const
 {
+    auto blurStart = std::chrono::high_resolution_clock::now();
     if (_useBlur)
     {
         // Blur the input image to remove noise.
         ApplyBlur(image);
     }
+
+    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - blurStart);
+    std::cout << "Time to apply blur: " << elapsed.count() << std::endl;
 
     if (_debug)
     {
@@ -33,30 +37,52 @@ void EdgeDetector<T>::FindEdges(Image<T> &image, T threshold, T edgeStrength) co
     Image<T> &initialEdges = image;
     Image<T> filterY(image);
 
+    auto filterStart = std::chrono::high_resolution_clock::now();
+
     // Apply a filter in two directions to find the image gradients.
     // filterX is reused here.
     ApplyFilter(filterX, filterY);
 
+    auto filterEnd = std::chrono::high_resolution_clock::now();
+    elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(filterEnd - filterStart);
+    std::cout << "Time to filter: " << elapsed.count() << std::endl;
+
     // Use the filtered images to find local maxima in the gradient.
     // Those correspond to best place for an edge.
     FindInitialEdges(filterX, filterY, initialEdges);
+
+    auto initialEdgesEnd = std::chrono::high_resolution_clock::now();
+    elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(initialEdgesEnd - filterEnd);
+    std::cout << "Time to find initial edges: " << elapsed.count() << std::endl;
+    ;
 
     if (_debug)
     {
         FileUtils::SaveImage(initialEdges, _debugPath + "initial-edges.tga");
     }
 
+    auto doubleThresholdStart = std::chrono::high_resolution_clock::now();
+
     // Apply a LOW and a HIGH threshold - everything below LOW is set to zero.
     // Everything above HIGH is edgeStrength
     initialEdges.ApplyDoubleThreshold(threshold / 4, threshold, edgeStrength);
+
+    auto doubleThresholdEnd = std::chrono::high_resolution_clock::now();
+    elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(doubleThresholdEnd - doubleThresholdStart);
+    std::cout << "Time to apply double thresold: " << elapsed.count() << std::endl;
 
     if (_debug)
     {
         FileUtils::SaveImage(initialEdges, _debugPath + "threshold.tga");
     }
 
+    auto hysteresisStart = std::chrono::high_resolution_clock::now();
     // Hysteresis edge tracking - look for adjacent "strong" edges.
     TrackEdges(initialEdges, image, edgeStrength);
+
+    auto hysteresisEnd = std::chrono::high_resolution_clock::now();
+    elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(hysteresisEnd - hysteresisStart);
+    std::cout << "Hysteresis: " << elapsed.count() << std::endl;
 
     if (_debug)
     {
